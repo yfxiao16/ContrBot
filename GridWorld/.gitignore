@@ -1,0 +1,16 @@
+# Generated output files
+*.structuredSlugs
+*.slugsin
+*.json
+*.smv
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Working directories
+out/
