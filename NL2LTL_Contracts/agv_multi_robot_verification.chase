@@ -1,0 +1,7 @@
+saturate Robot1;
+saturate Robot2;
+saturate Arbiter;
+saturate System;
+compose Robot1 Robot2 Robots;
+compose Robots Arbiter Composed;
+refinement Composed System refinement_multi_robot.smv;

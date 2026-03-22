@@ -1,0 +1,227 @@
+NAME: AGV_Patrol_Respond;
+
+# Patrol-and-respond AGV contract at the task abstraction level.
+# Scenario: Robot patrols warehouse zones (A, B, C) and responds to alerts.
+#   When an alert fires in a zone, the robot must visit that zone,
+#   inspect, and report — then resume patrol.
+#
+# This uses more complex NL2LTL patterns (nested, recurrence, persistence)
+# beyond the basic response pattern of the single-robot AGV.
+#
+# Abstraction: task-level (zone visits, alerts), NOT grid coordinates.
+
+CONTRACT PatrolEnvironment:
+    input boolean variable go_to_A;
+    input boolean variable go_to_B;
+    input boolean variable go_to_C;
+    input boolean variable inspect;
+    input boolean variable report;
+
+    output boolean variable at_A;
+    output boolean variable at_B;
+    output boolean variable at_C;
+    output boolean variable alert_A;
+    output boolean variable alert_B;
+    output boolean variable alert_C;
+    output boolean variable inspection_done;
+    output boolean variable report_ack;
+
+    Assumptions:
+        !go_to_A;
+        !go_to_B;
+        !go_to_C;
+        !inspect;
+        !report;
+
+    Guarantees:
+        !at_A;
+        !at_B;
+        !at_C;
+        !alert_A;
+        !alert_B;
+        !alert_C;
+        !inspection_done;
+        !report_ack;
+
+        # Navigation liveness: go_to -> eventually arrive
+        # Pattern: G(go_to_Shelf_1 -> F(at_Shelf_1))  [Paper Eq.2]
+        # Source: NL2LTL dataset_3000 id=3 "G (IntegrationTests -> F BuildSuccess)"
+        G(go_to_A -> F(at_A));
+        G(go_to_B -> F(at_B));
+        G(go_to_C -> F(at_C));
+
+        # Inspection liveness
+        # Source: NL2LTL dataset_3000 id=16 "G (Handshake -> F Backup)"
+        G(inspect -> F(inspection_done));
+
+        # Report liveness
+        # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)"
+        G(report -> F(report_ack));
+
+        # Alert persistence: alert stays until inspected
+        # Source: NL2LTL GridWorld task persistence pattern
+        G(alert_A & !inspection_done -> X(alert_A));
+        G(alert_B & !inspection_done -> X(alert_B));
+        G(alert_C & !inspection_done -> X(alert_C));
+
+        # Mutual exclusion: at most one location at a time
+        # Source: NL2LTL but_3000 id=4 "G !(UnitTests & Push)"
+        G(!(at_A & at_B));
+        G(!(at_A & at_C));
+        G(!(at_B & at_C));
+
+CONTRACT PatrolRobot:
+    input boolean variable at_A;
+    input boolean variable at_B;
+    input boolean variable at_C;
+    input boolean variable alert_A;
+    input boolean variable alert_B;
+    input boolean variable alert_C;
+    input boolean variable inspection_done;
+    input boolean variable report_ack;
+
+    output boolean variable go_to_A;
+    output boolean variable go_to_B;
+    output boolean variable go_to_C;
+    output boolean variable inspect;
+    output boolean variable report;
+
+    Assumptions:
+        !at_A;
+        !at_B;
+        !at_C;
+        !alert_A;
+        !alert_B;
+        !alert_C;
+        !inspection_done;
+        !report_ack;
+
+        G(go_to_A -> F(at_A));
+        G(go_to_B -> F(at_B));
+        G(go_to_C -> F(at_C));
+        G(inspect -> F(inspection_done));
+        G(report -> F(report_ack));
+
+        G(!(at_A & at_B));
+        G(!(at_A & at_C));
+        G(!(at_B & at_C));
+
+    Guarantees:
+        !go_to_A;
+        !go_to_B;
+        !go_to_C;
+        !inspect;
+        !report;
+
+        # === PATROL BEHAVIOR ===
+
+        # Recurrence: visit every zone infinitely often (patrol)
+        # Pattern: G F p
+        # Source: NL2LTL nested id=2 "G F Push", id=11 "G F Ack"
+        G F(at_A);
+        G F(at_B);
+        G F(at_C);
+
+        # === ALERT RESPONSE ===
+
+        # Response: alert in zone -> eventually go to that zone
+        # Pattern: G(p -> F q)
+        # Source: NL2LTL dataset_3000 id=3 "G (IntegrationTests -> F BuildSuccess)"
+        G(alert_A -> F(go_to_A));
+        G(alert_B -> F(go_to_B));
+        G(alert_C -> F(go_to_C));
+
+        # Response chain: arrive at alert zone -> inspect -> report
+        # Pattern: G(at_Shelf_1 -> F(pickup_X))  [Paper Eq.5]
+        G(at_A & alert_A -> F(inspect));
+        G(at_B & alert_B -> F(inspect));
+        G(at_C & alert_C -> F(inspect));
+
+        # Response: inspection done -> eventually report
+        # Pattern: G(has_X -> F(go_to_Dock_1))  [Paper Eq.6]
+        # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)"
+        G(inspection_done -> F(report));
+
+        # === SAFETY ===
+
+        # Safety: inspect only when at a location with an alert
+        # Pattern: G ! p (conditional)
+        # Source: NL2LTL dataset_3000 id=5 "G ! Request"
+        G(!at_A & !at_B & !at_C -> !inspect);
+        G(at_A & !alert_A -> !inspect);
+        G(at_B & !alert_B -> !inspect);
+        G(at_C & !alert_C -> !inspect);
+
+        # Safety: report only after inspection
+        # Pattern: (! p) U q (precedence)
+        # Source: NL2LTL dataset_3000 id=12 "(! BuildSuccess) U Commit"
+        (!report) U inspection_done;
+
+        # Safety: no movement during inspection
+        # Pattern: G ! (p & q) (mutual exclusion)
+        # Source: NL2LTL but_3000 id=4
+        G(!(inspect & go_to_A));
+        G(!(inspect & go_to_B));
+        G(!(inspect & go_to_C));
+
+        # Safety: one destination at a time
+        G(!(go_to_A & go_to_B));
+        G(!(go_to_A & go_to_C));
+        G(!(go_to_B & go_to_C));
+
+        # === COMPLEX PATTERNS ===
+
+        # After alert response, patrol resumes (until-response)
+        # Pattern: G (PacketLoss -> (! PacketLoss U Handshake))
+        # Source: NL2LTL dataset_3000 id=20
+        G(report_ack -> (!inspect U (alert_A | alert_B | alert_C | go_to_A | go_to_B | go_to_C)));
+
+        # Bounded response: after arriving at alert zone, inspect within 2 steps
+        # Pattern: G (AlarmOn -> X (X DoorClosed))
+        # Source: NL2LTL dataset_3000 id=18
+        G(at_A & alert_A -> X(X(inspect | !at_A)));
+        G(at_B & alert_B -> X(X(inspect | !at_B)));
+        G(at_C & alert_C -> X(X(inspect | !at_C)));
+
+CONTRACT System:
+    input boolean variable alert_A;
+    input boolean variable alert_B;
+    input boolean variable alert_C;
+
+    output boolean variable at_A;
+    output boolean variable at_B;
+    output boolean variable at_C;
+    output boolean variable inspect;
+    output boolean variable report;
+    output boolean variable inspection_done;
+    output boolean variable report_ack;
+
+    Assumptions:
+        !alert_A;
+        !alert_B;
+        !alert_C;
+
+    Guarantees:
+        !at_A;
+        !at_B;
+        !at_C;
+        !inspect;
+        !report;
+        !inspection_done;
+        !report_ack;
+
+        # Patrol liveness: every zone visited infinitely often
+        G F(at_A);
+        G F(at_B);
+        G F(at_C);
+
+        # Alert response: alert -> eventually inspect and report
+        G(alert_A -> F(inspection_done));
+        G(alert_B -> F(inspection_done));
+        G(alert_C -> F(inspection_done));
+        G(inspection_done -> F(report_ack));
+
+        # Safety: mutual exclusion on locations
+        G(!(at_A & at_B));
+        G(!(at_A & at_C));
+        G(!(at_B & at_C));

@@ -1,0 +1,43 @@
+[INPUT]
+at_A
+at_B
+at_C
+alert_A
+alert_B
+alert_C
+inspection_done
+report_ack
+
+
+
+[OUTPUT]
+go_to_A
+go_to_B
+go_to_C
+inspect
+report
+
+
+
+[ENV_TRANS]
+| ! go_to_A at_A
+| ! go_to_B at_B
+| ! go_to_C at_C
+| ! inspect inspection_done
+| ! report report_ack
+! & at_A at_B
+! & at_A at_C
+! & at_B at_C
+
+
+[ENV_INIT]
+! at_A
+! at_B
+! at_C
+! alert_A
+! alert_B
+! alert_C
+! inspection_done
+! report_ack
+
+

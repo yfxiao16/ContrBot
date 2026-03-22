@@ -1,0 +1,5 @@
+saturate Environment;
+saturate Robot;
+saturate System;
+compose Environment Robot Composed;
+refinement Composed System refinement_warehouse.smv;

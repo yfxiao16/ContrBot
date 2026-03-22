@@ -1,0 +1,216 @@
+NAME: AGV_Warehouse_SingleRobot;
+
+# Single-robot warehouse AGV contract at the task abstraction level.
+# Scenario: Robot R1 picks up an item from a shelf and delivers to a dock.
+#
+# This matches the NL2RC paper (Section 3.1) assume-guarantee structure:
+#   Environmental Assumptions -> Robotic Behaviors
+#
+# Atomic propositions (task-level, NOT grid coordinates):
+#   go_to_shelf    : robot is navigating to the shelf       (output)
+#   at_shelf       : robot has arrived at the shelf         (input)
+#   pickup         : robot initiates pickup                 (output)
+#   has_item       : robot has successfully picked up item  (input)
+#   go_to_dock     : robot is navigating to the dock        (output)
+#   at_dock        : robot has arrived at the dock          (input)
+#   dropoff        : robot initiates drop-off               (output)
+#   delivered      : item has been delivered                 (input)
+#   task           : environment assigns a delivery task    (input)
+#   done           : robot signals task completion          (output)
+#
+# LTL patterns from NL2LTL datasets are annotated per formula.
+
+CONTRACT Environment:
+    # Environmental assumptions: liveness guarantees about the world.
+    # These encode that physical actions eventually succeed.
+    # (Paper Section 3.1.1, Equations 2-4)
+
+    input boolean variable go_to_shelf;
+    input boolean variable pickup;
+    input boolean variable go_to_dock;
+    input boolean variable dropoff;
+
+    output boolean variable at_shelf;
+    output boolean variable has_item;
+    output boolean variable at_dock;
+    output boolean variable delivered;
+    output boolean variable task;
+
+    Assumptions:
+        # Controller starts idle
+        !go_to_shelf;
+        !pickup;
+        !go_to_dock;
+        !dropoff;
+
+    Guarantees:
+        # Initially: no items, not at locations, no task
+        !at_shelf;
+        !has_item;
+        !at_dock;
+        !delivered;
+        !task;
+
+        # Navigation liveness: if robot goes to shelf, it eventually arrives
+        # Pattern: G(go_to_Shelf_1 -> F(at_Shelf_1))  [Paper Eq.2]
+        # Source: NL2LTL dataset_3000 id=3
+        G(go_to_shelf -> F(at_shelf));
+
+        # Pickup liveness: if robot picks up, it eventually has the item
+        # Pattern: G(pickup_X -> F(has_X))  [Paper Eq.3]
+        # Source: NL2LTL dataset_3000 id=9
+        G(pickup -> F(has_item));
+
+        # Navigation liveness: if robot goes to dock, it eventually arrives
+        # Pattern: G(go_to_Dock_1 -> F(at_Dock_1))  [Paper Eq.4]
+        # Source: NL2LTL dataset_3000 id=16
+        G(go_to_dock -> F(at_dock));
+
+        # Dropoff liveness: if robot drops off, item is eventually delivered
+        # Source: NL2LTL dataset_3000 id=3 (response pattern)
+        G(dropoff -> F(delivered));
+
+        # Task fairness: tasks recur infinitely often
+        # Source: NL2LTL nested id=2
+        G F(task);
+
+        # Task persistence: task stays active until done
+        G(task & !delivered -> X(task));
+
+CONTRACT Robot:
+    # Robotic behavior guarantees: temporal commitments the controller makes.
+    # (Paper Section 3.1.2, Equations 5-7)
+
+    input boolean variable at_shelf;
+    input boolean variable has_item;
+    input boolean variable at_dock;
+    input boolean variable delivered;
+    input boolean variable task;
+
+    output boolean variable go_to_shelf;
+    output boolean variable pickup;
+    output boolean variable go_to_dock;
+    output boolean variable dropoff;
+    output boolean variable done;
+
+    Assumptions:
+        # Environment guarantees from above
+        !at_shelf;
+        !has_item;
+        !at_dock;
+        !delivered;
+        !task;
+
+        G(go_to_shelf -> F(at_shelf));
+        G(pickup -> F(has_item));
+        G(go_to_dock -> F(at_dock));
+        G(dropoff -> F(delivered));
+        G F(task);
+        G(task & !delivered -> X(task));
+
+    Guarantees:
+        # Initially idle
+        !go_to_shelf;
+        !pickup;
+        !go_to_dock;
+        !dropoff;
+        !done;
+
+        # Response: when task assigned, eventually go to shelf
+        # Source: NL2LTL dataset_3000 id=1
+        G(task & !has_item & !at_shelf -> F(go_to_shelf));
+
+        # Response: at shelf -> eventually pickup
+        # Pattern: G(at_Shelf_1 -> F(pickup_X))  [Paper Eq.5]
+        # Source: NL2LTL dataset_3000 id=3
+        G(at_shelf -> F(pickup));
+
+        # Response: has item -> eventually go to dock
+        # Pattern: G(has_X -> F(go_to_Dock_1))  [Paper Eq.6]
+        # Source: NL2LTL dataset_3000 id=9
+        G(has_item -> F(go_to_dock));
+
+        # Response: at dock with item -> eventually dropoff
+        # Pattern: G(at_Dock_1 & has_X -> F(dropoff_X))  [Paper Eq.7]
+        # Source: NL2LTL dataset_3000 id=14 adapted
+        G(at_dock & has_item -> F(dropoff));
+
+        # Safety: no pickup without being at shelf
+        # Pattern: G ! p (conditional invariance)
+        # Source: NL2LTL dataset_3000 id=5
+        G(!at_shelf -> !pickup);
+
+        # Safety: no dropoff without being at dock with item
+        G(!at_dock | !has_item -> !dropoff);
+
+        # Precedence: no go_to_dock before having item
+        # Pattern: (! p) U q
+        # Source: NL2LTL dataset_3000 id=10
+        (!go_to_dock) U has_item;
+
+        # Precedence: no dropoff before arriving at dock
+        # Source: NL2LTL dataset_3000 id=12
+        (!dropoff) U at_dock;
+
+        # Mutual exclusion: cannot do two actions at once
+        # Source: NL2LTL but_3000 id=4
+        G(!(go_to_shelf & pickup));
+        G(!(go_to_shelf & go_to_dock));
+        G(!(pickup & go_to_dock));
+        G(!(pickup & dropoff));
+        G(!(go_to_dock & dropoff));
+
+        # Done semantics: delivered means done
+        G(delivered <-> done);
+
+        # Liveness: eventually complete the task
+        # Source: NL2LTL nested id=2
+        G F(done);
+
+CONTRACT System:
+    # System-level contract: composition of Environment + Robot.
+    # Only task and delivered are true I/O at system boundary.
+
+    input boolean variable task;
+
+    output boolean variable go_to_shelf;
+    output boolean variable at_shelf;
+    output boolean variable pickup;
+    output boolean variable has_item;
+    output boolean variable go_to_dock;
+    output boolean variable at_dock;
+    output boolean variable dropoff;
+    output boolean variable delivered;
+    output boolean variable done;
+
+    Assumptions:
+        !task;
+        G F(task);
+        G(task & !delivered -> X(task));
+
+    Guarantees:
+        # Initial state
+        !go_to_shelf;
+        !at_shelf;
+        !pickup;
+        !has_item;
+        !go_to_dock;
+        !at_dock;
+        !dropoff;
+        !delivered;
+        !done;
+
+        # End-to-end: task eventually leads to delivery
+        G(task -> F(delivered));
+
+        # Ordering: shelf -> pickup -> dock -> dropoff
+        (!go_to_dock) U has_item;
+        (!dropoff) U at_dock;
+
+        # Safety: action mutual exclusion
+        G(!(go_to_shelf & pickup));
+        G(!(pickup & go_to_dock));
+        G(!(go_to_dock & dropoff));
+
+        # Liveness
+        G F(done);

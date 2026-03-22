@@ -1,0 +1,269 @@
+NAME: AGV_Warehouse_MultiRobot;
+
+# Multi-robot warehouse AGV contracts at the task abstraction level.
+# Scenario: Two robots (R1, R2) each handle pick-and-deliver tasks.
+#   An Arbiter ensures they don't access the same shelf/dock simultaneously.
+#
+# This extends the NL2RC paper's single-robot AGV to a multi-agent setting
+# using the same assume-guarantee decomposition but with coordination.
+#
+# Abstraction: task-level props (at_shelf, has_item, etc.), NOT grid coords.
+
+CONTRACT Robot1:
+    input boolean variable r1_task;
+    input boolean variable r1_at_shelf;
+    input boolean variable r1_has_item;
+    input boolean variable r1_at_dock;
+    input boolean variable r1_delivered;
+    input boolean variable r1_shelf_grant;
+    input boolean variable r1_dock_grant;
+
+    output boolean variable r1_go_to_shelf;
+    output boolean variable r1_pickup;
+    output boolean variable r1_go_to_dock;
+    output boolean variable r1_dropoff;
+    output boolean variable r1_done;
+    output boolean variable r1_shelf_request;
+    output boolean variable r1_dock_request;
+
+    Assumptions:
+        !r1_task;
+        !r1_at_shelf;
+        !r1_has_item;
+        !r1_at_dock;
+        !r1_delivered;
+        !r1_shelf_grant;
+        !r1_dock_grant;
+
+        # Environment liveness (Paper Eq.2-4 pattern)
+        # Source: NL2LTL dataset_3000 id=3 "G (IntegrationTests -> F BuildSuccess)"
+        G(r1_go_to_shelf & r1_shelf_grant -> F(r1_at_shelf));
+        G(r1_pickup -> F(r1_has_item));
+        G(r1_go_to_dock & r1_dock_grant -> F(r1_at_dock));
+        G(r1_dropoff -> F(r1_delivered));
+
+        # Task fairness
+        # Source: NL2LTL nested id=2 "G F Push"
+        G F(r1_task);
+
+        # Task persistence
+        G(r1_task & !r1_delivered -> X(r1_task));
+
+        # Grant fairness: if requested, eventually granted
+        # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)"
+        G F(r1_shelf_request -> r1_shelf_grant);
+        G F(r1_dock_request -> r1_dock_grant);
+
+    Guarantees:
+        !r1_go_to_shelf;
+        !r1_pickup;
+        !r1_go_to_dock;
+        !r1_dropoff;
+        !r1_done;
+        !r1_shelf_request;
+        !r1_dock_request;
+
+        # Robot behavior chain (Paper Eq.5-7 pattern)
+        # Source: NL2LTL dataset_3000 id=3,9 "G (p -> F q)" (response)
+        G(r1_task & !r1_has_item & !r1_at_shelf -> F(r1_go_to_shelf));
+        G(r1_at_shelf -> F(r1_pickup));
+        G(r1_has_item -> F(r1_go_to_dock));
+        G(r1_at_dock & r1_has_item -> F(r1_dropoff));
+
+        # Safety: actions require location
+        # Source: NL2LTL dataset_3000 id=5 "G ! Request"
+        G(!r1_at_shelf -> !r1_pickup);
+        G(!r1_at_dock | !r1_has_item -> !r1_dropoff);
+
+        # Safety: must request before accessing shared resources
+        # Source: NL2LTL dataset_3000 id=10 "(! Commit) U TestFailed"
+        G(r1_go_to_shelf -> r1_shelf_request);
+        G(r1_go_to_dock -> r1_dock_request);
+
+        # Safety: don't go without grant
+        G(!r1_shelf_grant -> !r1_go_to_shelf);
+        G(!r1_dock_grant -> !r1_go_to_dock);
+
+        # Precedence: ordering
+        # Source: NL2LTL dataset_3000 id=10,12 "(! p) U q"
+        (!r1_go_to_dock) U r1_has_item;
+        (!r1_dropoff) U r1_at_dock;
+
+        # Mutual exclusion of actions
+        # Source: NL2LTL but_3000 id=4 "G !(UnitTests & Push)"
+        G(!(r1_go_to_shelf & r1_go_to_dock));
+        G(!(r1_pickup & r1_dropoff));
+
+        # Done semantics
+        G(r1_delivered <-> r1_done);
+
+        # Liveness
+        # Source: NL2LTL nested id=2 "G F Push"
+        G F(r1_done);
+
+CONTRACT Robot2:
+    input boolean variable r2_task;
+    input boolean variable r2_at_shelf;
+    input boolean variable r2_has_item;
+    input boolean variable r2_at_dock;
+    input boolean variable r2_delivered;
+    input boolean variable r2_shelf_grant;
+    input boolean variable r2_dock_grant;
+
+    output boolean variable r2_go_to_shelf;
+    output boolean variable r2_pickup;
+    output boolean variable r2_go_to_dock;
+    output boolean variable r2_dropoff;
+    output boolean variable r2_done;
+    output boolean variable r2_shelf_request;
+    output boolean variable r2_dock_request;
+
+    Assumptions:
+        !r2_task;
+        !r2_at_shelf;
+        !r2_has_item;
+        !r2_at_dock;
+        !r2_delivered;
+        !r2_shelf_grant;
+        !r2_dock_grant;
+
+        # Environment liveness (same pattern as Robot1)
+        G(r2_go_to_shelf & r2_shelf_grant -> F(r2_at_shelf));
+        G(r2_pickup -> F(r2_has_item));
+        G(r2_go_to_dock & r2_dock_grant -> F(r2_at_dock));
+        G(r2_dropoff -> F(r2_delivered));
+
+        G F(r2_task);
+        G(r2_task & !r2_delivered -> X(r2_task));
+
+        G F(r2_shelf_request -> r2_shelf_grant);
+        G F(r2_dock_request -> r2_dock_grant);
+
+    Guarantees:
+        !r2_go_to_shelf;
+        !r2_pickup;
+        !r2_go_to_dock;
+        !r2_dropoff;
+        !r2_done;
+        !r2_shelf_request;
+        !r2_dock_request;
+
+        # Robot behavior chain (Paper Eq.5-7)
+        G(r2_task & !r2_has_item & !r2_at_shelf -> F(r2_go_to_shelf));
+        G(r2_at_shelf -> F(r2_pickup));
+        G(r2_has_item -> F(r2_go_to_dock));
+        G(r2_at_dock & r2_has_item -> F(r2_dropoff));
+
+        # Safety
+        G(!r2_at_shelf -> !r2_pickup);
+        G(!r2_at_dock | !r2_has_item -> !r2_dropoff);
+        G(r2_go_to_shelf -> r2_shelf_request);
+        G(r2_go_to_dock -> r2_dock_request);
+        G(!r2_shelf_grant -> !r2_go_to_shelf);
+        G(!r2_dock_grant -> !r2_go_to_dock);
+
+        # Precedence
+        (!r2_go_to_dock) U r2_has_item;
+        (!r2_dropoff) U r2_at_dock;
+
+        # Mutual exclusion
+        G(!(r2_go_to_shelf & r2_go_to_dock));
+        G(!(r2_pickup & r2_dropoff));
+
+        # Done
+        G(r2_delivered <-> r2_done);
+        G F(r2_done);
+
+CONTRACT Arbiter:
+    # Task-level arbiter: ensures mutual exclusion on shared resources
+    # (shelves and docks). Analogous to GridWorld's centralized Arbiter,
+    # but at the task abstraction level.
+
+    input boolean variable r1_shelf_request;
+    input boolean variable r1_dock_request;
+    input boolean variable r2_shelf_request;
+    input boolean variable r2_dock_request;
+
+    output boolean variable r1_shelf_grant;
+    output boolean variable r1_dock_grant;
+    output boolean variable r2_shelf_grant;
+    output boolean variable r2_dock_grant;
+
+    Assumptions:
+        !r1_shelf_request;
+        !r1_dock_request;
+        !r2_shelf_request;
+        !r2_dock_request;
+
+    Guarantees:
+        !r1_shelf_grant;
+        !r1_dock_grant;
+        !r2_shelf_grant;
+        !r2_dock_grant;
+
+        # Safety: mutual exclusion on same shelf
+        # Two robots cannot be granted the same shelf simultaneously.
+        # Source: NL2LTL but_3000 id=4 "G !(UnitTests & Push)"
+        G(!(r1_shelf_grant & r2_shelf_grant));
+
+        # Safety: mutual exclusion on same dock
+        G(!(r1_dock_grant & r2_dock_grant));
+
+        # Grant only on request (Paper centralized pattern)
+        G(r1_shelf_grant -> r1_shelf_request);
+        G(r1_dock_grant -> r1_dock_request);
+        G(r2_shelf_grant -> r2_shelf_request);
+        G(r2_dock_grant -> r2_dock_request);
+
+        # Fairness: requests are eventually granted
+        # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)" (response)
+        G F(r1_shelf_request -> r1_shelf_grant);
+        G F(r1_dock_request -> r1_dock_grant);
+        G F(r2_shelf_request -> r2_shelf_grant);
+        G F(r2_dock_request -> r2_dock_grant);
+
+CONTRACT System:
+    input boolean variable r1_task;
+    input boolean variable r2_task;
+
+    output boolean variable r1_go_to_shelf;
+    output boolean variable r1_pickup;
+    output boolean variable r1_go_to_dock;
+    output boolean variable r1_dropoff;
+    output boolean variable r1_done;
+    output boolean variable r2_go_to_shelf;
+    output boolean variable r2_pickup;
+    output boolean variable r2_go_to_dock;
+    output boolean variable r2_dropoff;
+    output boolean variable r2_done;
+
+    Assumptions:
+        !r1_task;
+        !r2_task;
+        G F(r1_task);
+        G F(r2_task);
+
+    Guarantees:
+        !r1_go_to_shelf;
+        !r1_pickup;
+        !r1_go_to_dock;
+        !r1_dropoff;
+        !r1_done;
+        !r2_go_to_shelf;
+        !r2_pickup;
+        !r2_go_to_dock;
+        !r2_dropoff;
+        !r2_done;
+
+        # End-to-end liveness: each robot eventually completes tasks
+        G(r1_task -> F(r1_done));
+        G(r2_task -> F(r2_done));
+
+        # Safety: mutual exclusion at shared resources
+        # Source: NL2LTL but_3000 id=4 "G !(p & q)"
+        G(!(r1_go_to_shelf & r2_go_to_shelf));
+        G(!(r1_go_to_dock & r2_go_to_dock));
+
+        # Recurrence
+        G F(r1_done);
+        G F(r2_done);

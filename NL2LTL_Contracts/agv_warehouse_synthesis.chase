@@ -1,0 +1,3 @@
+saturate Environment;
+saturate Robot;
+synthesize Robot robot;

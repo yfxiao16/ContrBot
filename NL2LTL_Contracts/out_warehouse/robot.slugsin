@@ -1,0 +1,38 @@
+[INPUT]
+at_shelf
+has_item
+at_dock
+delivered
+task
+
+
+
+[OUTPUT]
+go_to_shelf
+pickup
+go_to_dock
+dropoff
+done
+
+
+
+[ENV_TRANS]
+| ! go_to_shelf at_shelf
+| ! pickup has_item
+| ! go_to_dock at_dock
+| ! dropoff delivered
+| ! & task ! delivered task'
+
+
+[ENV_INIT]
+! at_shelf
+! has_item
+! at_dock
+! delivered
+! task
+
+
+[ENV_LIVENESS]
+task
+
+
