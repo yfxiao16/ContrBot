@@ -51,8 +51,8 @@ CONTRACT Robot1:
 
         # Grant fairness: if requested, eventually granted
         # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)"
-        G F(r1_shelf_request -> r1_shelf_grant);
-        G F(r1_dock_request -> r1_dock_grant);
+        G(r1_shelf_request -> F(r1_shelf_grant));
+        G(r1_dock_request -> F(r1_dock_grant));
 
     Guarantees:
         !r1_go_to_shelf;
@@ -136,8 +136,8 @@ CONTRACT Robot2:
         G F(r2_task);
         G(r2_task & !r2_delivered -> X(r2_task));
 
-        G F(r2_shelf_request -> r2_shelf_grant);
-        G F(r2_dock_request -> r2_dock_grant);
+        G(r2_shelf_request -> F(r2_shelf_grant));
+        G(r2_dock_request -> F(r2_dock_grant));
 
     Guarantees:
         !r2_go_to_shelf;
@@ -217,10 +217,10 @@ CONTRACT Arbiter:
 
         # Fairness: requests are eventually granted
         # Source: NL2LTL dataset_3000 id=9 "G (Ack -> F Request)" (response)
-        G F(r1_shelf_request -> r1_shelf_grant);
-        G F(r1_dock_request -> r1_dock_grant);
-        G F(r2_shelf_request -> r2_shelf_grant);
-        G F(r2_dock_request -> r2_dock_grant);
+        G(r1_shelf_request -> F(r1_shelf_grant));
+        G(r1_dock_request -> F(r1_dock_grant));
+        G(r2_shelf_request -> F(r2_shelf_grant));
+        G(r2_dock_request -> F(r2_dock_grant));
 
 CONTRACT System:
     input boolean variable r1_task;

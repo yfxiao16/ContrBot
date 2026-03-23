@@ -1,0 +1,41 @@
+[INPUT]
+r2_task
+r2_at_shelf
+r2_has_item
+r2_at_dock
+r2_delivered
+r2_shelf_grant
+r2_dock_grant
+
+
+[OUTPUT]
+r2_go_to_shelf
+r2_pickup
+r2_go_to_dock
+r2_dropoff
+r2_done
+r2_shelf_request
+r2_dock_request
+
+
+[ENV_INIT]
+(!(r2_task))
+(!(r2_at_shelf))
+(!(r2_has_item))
+(!(r2_at_dock))
+(!(r2_delivered))
+(!(r2_shelf_grant))
+(!(r2_dock_grant))
+
+[ENV_TRANS]
+((r2_go_to_shelf & r2_shelf_grant) -> r2_at_shelf)
+(r2_pickup -> r2_has_item)
+((r2_go_to_dock & r2_dock_grant) -> r2_at_dock)
+(r2_dropoff -> r2_delivered)
+((r2_task & (!(r2_delivered))) -> r2_task')
+(r2_shelf_request -> r2_shelf_grant)
+(r2_dock_request -> r2_dock_grant)
+
+[ENV_LIVENESS]
+r2_task
+
