@@ -27,6 +27,10 @@ done
 (go_to_dock -> at_dock)
 (dropoff -> delivered)
 ((task & (!(delivered))) -> task')
+((at_shelf & (!(go_to_dock))) -> at_shelf')
+((has_item & (!(dropoff))) -> has_item')
+((at_dock & (!(go_to_shelf))) -> at_dock')
+(!((at_shelf & at_dock)))
 
 [ENV_LIVENESS]
 task

@@ -20,63 +20,6 @@ NAME: AGV_Warehouse_SingleRobot;
 #
 # LTL patterns from NL2LTL datasets are annotated per formula.
 
-CONTRACT Environment:
-    # Environmental assumptions: liveness guarantees about the world.
-    # These encode that physical actions eventually succeed.
-    # (Paper Section 3.1.1, Equations 2-4)
-
-    input boolean variable go_to_shelf;
-    input boolean variable pickup;
-    input boolean variable go_to_dock;
-    input boolean variable dropoff;
-
-    output boolean variable at_shelf;
-    output boolean variable has_item;
-    output boolean variable at_dock;
-    output boolean variable delivered;
-    output boolean variable task;
-
-    Assumptions:
-        # Controller starts idle
-        !go_to_shelf;
-        !pickup;
-        !go_to_dock;
-        !dropoff;
-
-    Guarantees:
-        # Initially: no items, not at locations, no task
-        !at_shelf;
-        !has_item;
-        !at_dock;
-        !delivered;
-        !task;
-
-        # Navigation liveness: if robot goes to shelf, it eventually arrives
-        # Pattern: G(go_to_Shelf_1 -> F(at_Shelf_1))  [Paper Eq.2]
-        # Source: NL2LTL dataset_3000 id=3
-        G(go_to_shelf -> F(at_shelf));
-
-        # Pickup liveness: if robot picks up, it eventually has the item
-        # Pattern: G(pickup_X -> F(has_X))  [Paper Eq.3]
-        # Source: NL2LTL dataset_3000 id=9
-        G(pickup -> F(has_item));
-
-        # Navigation liveness: if robot goes to dock, it eventually arrives
-        # Pattern: G(go_to_Dock_1 -> F(at_Dock_1))  [Paper Eq.4]
-        # Source: NL2LTL dataset_3000 id=16
-        G(go_to_dock -> F(at_dock));
-
-        # Dropoff liveness: if robot drops off, item is eventually delivered
-        # Source: NL2LTL dataset_3000 id=3 (response pattern)
-        G(dropoff -> F(delivered));
-
-        # Task fairness: tasks recur infinitely often
-        # Source: NL2LTL nested id=2
-        G F(task);
-
-        # Task persistence: task stays active until done
-        G(task & !delivered -> X(task));
-
 CONTRACT Robot:
     # Robotic behavior guarantees: temporal commitments the controller makes.
     # (Paper Section 3.1.2, Equations 5-7)
@@ -107,6 +50,12 @@ CONTRACT Robot:
         G(dropoff -> F(delivered));
         G F(task);
         G(task & !delivered -> X(task));
+
+        G(at_shelf & !go_to_dock -> X(at_shelf));
+        G(has_item & !dropoff -> X(has_item));
+        G(at_dock & !go_to_shelf -> X(at_dock));
+
+        G(!(at_shelf & at_dock));
 
     Guarantees:
         # Initially idle
@@ -160,6 +109,10 @@ CONTRACT Robot:
         G(!(pickup & dropoff));
         G(!(go_to_dock & dropoff));
 
+        # Action persistence: keep navigating until arrival
+        G(go_to_shelf & !at_shelf -> X(go_to_shelf));
+        G(go_to_dock & !at_dock -> X(go_to_dock));
+
         # Done semantics: delivered means done
         G(delivered <-> done);
 
@@ -168,36 +121,54 @@ CONTRACT Robot:
         G F(done);
 
 CONTRACT System:
-    # System-level contract: composition of Environment + Robot.
-    # Only task and delivered are true I/O at system boundary.
+    # System-level contract: Robot controller verified against environment.
+    # Environment physics go in Assumptions (matching GridWorld pattern).
+    # Robot behavior goes in Guarantees.
 
+    input boolean variable at_shelf;
+    input boolean variable has_item;
+    input boolean variable at_dock;
+    input boolean variable delivered;
     input boolean variable task;
 
     output boolean variable go_to_shelf;
-    output boolean variable at_shelf;
     output boolean variable pickup;
-    output boolean variable has_item;
     output boolean variable go_to_dock;
-    output boolean variable at_dock;
     output boolean variable dropoff;
-    output boolean variable delivered;
     output boolean variable done;
 
     Assumptions:
+        # Initial environment state
+        !at_shelf;
+        !has_item;
+        !at_dock;
+        !delivered;
         !task;
+
+        # Environment liveness: actions eventually succeed
+        G(go_to_shelf -> F(at_shelf));
+        G(pickup -> F(has_item));
+        G(go_to_dock -> F(at_dock));
+        G(dropoff -> F(delivered));
+
+        # Task fairness and persistence
         G F(task);
         G(task & !delivered -> X(task));
+
+        # State persistence
+        G(at_shelf & !go_to_dock -> X(at_shelf));
+        G(has_item & !dropoff -> X(has_item));
+        G(at_dock & !go_to_shelf -> X(at_dock));
+
+        # Location mutual exclusion
+        G(!(at_shelf & at_dock));
 
     Guarantees:
         # Initial state
         !go_to_shelf;
-        !at_shelf;
         !pickup;
-        !has_item;
         !go_to_dock;
-        !at_dock;
         !dropoff;
-        !delivered;
         !done;
 
         # End-to-end: task eventually leads to delivery

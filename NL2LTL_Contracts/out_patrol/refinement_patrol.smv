@@ -1,10 +1,5 @@
 MODULE main
 VAR
-	go_to_A : boolean;
-	go_to_B : boolean;
-	go_to_C : boolean;
-	inspect : boolean;
-	report : boolean;
 	at_A : boolean;
 	at_B : boolean;
 	at_C : boolean;
@@ -13,16 +8,13 @@ VAR
 	alert_C : boolean;
 	inspection_done : boolean;
 	report_ack : boolean;
+	go_to_A : boolean;
+	go_to_B : boolean;
+	go_to_C : boolean;
+	inspect : boolean;
+	report : boolean;
 	LTLSPEC (
-		( !(alert_A) &  !(alert_B) &  !(alert_C) -> (( !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) &  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
-		( G (go_to_A -> ( F at_A))) & 
-		( G (go_to_B -> ( F at_B))) & 
-		( G (go_to_C -> ( F at_C))) & 
-		( G (inspect -> ( F inspection_done))) & 
-		( G (report -> ( F report_ack))) & 
-		( G  !((at_A & at_B))) & 
-		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) |  !((( !( !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report)) |  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
 		( G (go_to_A -> ( F at_A))) & 
 		( G (go_to_B -> ( F at_B))) & 
 		( G (go_to_C -> ( F at_C))) & 
@@ -33,7 +25,7 @@ VAR
 		( G ((alert_C &  !(inspection_done)) -> ( X alert_C))) & 
 		( G  !((at_A & at_B))) & 
 		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) & ( !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		( G  !((at_B & at_C))) ->  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
 		( G (go_to_A -> ( F at_A))) & 
 		( G (go_to_B -> ( F at_B))) & 
 		( G (go_to_C -> ( F at_C))) & 
@@ -41,53 +33,24 @@ VAR
 		( G (report -> ( F report_ack))) & 
 		( G  !((at_A & at_B))) & 
 		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) |  !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) & 
-		( G ( F at_A)) & 
-		( G ( F at_B)) & 
-		( G ( F at_C)) & 
-		( G (alert_A -> ( F go_to_A))) & 
-		( G (alert_B -> ( F go_to_B))) & 
-		( G (alert_C -> ( F go_to_C))) & 
-		( G ((at_A & alert_A) -> ( F inspect))) & 
-		( G ((at_B & alert_B) -> ( F inspect))) & 
-		( G ((at_C & alert_C) -> ( F inspect))) & 
-		( G (inspection_done -> ( F report))) & 
-		( G ((( !(at_A) &  !(at_B)) &  !(at_C)) ->  !(inspect))) & 
-		( G ((at_A &  !(alert_A)) ->  !(inspect))) & 
-		( G ((at_B &  !(alert_B)) ->  !(inspect))) & 
-		( G ((at_C &  !(alert_C)) ->  !(inspect))) & ( !(report) U inspection_done) & 
-		( G  !((inspect & go_to_A))) & 
-		( G  !((inspect & go_to_B))) & 
-		( G  !((inspect & go_to_C))) & 
-		( G  !((go_to_A & go_to_B))) & 
-		( G  !((go_to_A & go_to_C))) & 
-		( G  !((go_to_B & go_to_C))) & 
-		( G (report_ack -> ( !(inspect) U (((((alert_A | alert_B) | alert_C) | go_to_A) | go_to_B) | go_to_C)))) & 
-		( G ((at_A & alert_A) -> ( X ( X (inspect |  !(at_A)))))) & 
-		( G ((at_B & alert_B) -> ( X ( X (inspect |  !(at_B)))))) & 
-		( G ((at_C & alert_C) -> ( X ( X (inspect |  !(at_C))))))))))) )
+		( G  !((at_B & at_C))) & 
+		( G ((alert_A &  !(inspection_done)) -> ( X alert_A))) & 
+		( G ((alert_B &  !(inspection_done)) -> ( X alert_B))) & 
+		( G ((alert_C &  !(inspection_done)) -> ( X alert_C)))) )
 
 	LTLSPEC (
-		(((( !( !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report)) |  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		((( !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
 		( G (go_to_A -> ( F at_A))) & 
 		( G (go_to_B -> ( F at_B))) & 
 		( G (go_to_C -> ( F at_C))) & 
 		( G (inspect -> ( F inspection_done))) & 
 		( G (report -> ( F report_ack))) & 
+		( G  !((at_A & at_B))) & 
+		( G  !((at_A & at_C))) & 
+		( G  !((at_B & at_C))) & 
 		( G ((alert_A &  !(inspection_done)) -> ( X alert_A))) & 
 		( G ((alert_B &  !(inspection_done)) -> ( X alert_B))) & 
-		( G ((alert_C &  !(inspection_done)) -> ( X alert_C))) & 
-		( G  !((at_A & at_B))) & 
-		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) & ( !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
-		( G (go_to_A -> ( F at_A))) & 
-		( G (go_to_B -> ( F at_B))) & 
-		( G (go_to_C -> ( F at_C))) & 
-		( G (inspect -> ( F inspection_done))) & 
-		( G (report -> ( F report_ack))) & 
-		( G  !((at_A & at_B))) & 
-		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) |  !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) & 
+		( G ((alert_C &  !(inspection_done)) -> ( X alert_C)))) |  !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) & 
 		( G ( F at_A)) & 
 		( G ( F at_B)) & 
 		( G ( F at_C)) & 
@@ -111,7 +74,7 @@ VAR
 		( G (report_ack -> ( !(inspect) U (((((alert_A | alert_B) | alert_C) | go_to_A) | go_to_B) | go_to_C)))) & 
 		( G ((at_A & alert_A) -> ( X ( X (inspect |  !(at_A)))))) & 
 		( G ((at_B & alert_B) -> ( X ( X (inspect |  !(at_B)))))) & 
-		( G ((at_C & alert_C) -> ( X ( X (inspect |  !(at_C)))))))) |  !((( !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) &  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		( G ((at_C & alert_C) -> ( X ( X (inspect |  !(at_C))))))) |  !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
 		( G (go_to_A -> ( F at_A))) & 
 		( G (go_to_B -> ( F at_B))) & 
 		( G (go_to_C -> ( F at_C))) & 
@@ -119,7 +82,10 @@ VAR
 		( G (report -> ( F report_ack))) & 
 		( G  !((at_A & at_B))) & 
 		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) |  !((( !( !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report)) |  !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		( G  !((at_B & at_C))) & 
+		( G ((alert_A &  !(inspection_done)) -> ( X alert_A))) & 
+		( G ((alert_B &  !(inspection_done)) -> ( X alert_B))) & 
+		( G ((alert_C &  !(inspection_done)) -> ( X alert_C))))) -> (( !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
 		( G (go_to_A -> ( F at_A))) & 
 		( G (go_to_B -> ( F at_B))) & 
 		( G (go_to_C -> ( F at_C))) & 
@@ -130,39 +96,7 @@ VAR
 		( G ((alert_C &  !(inspection_done)) -> ( X alert_C))) & 
 		( G  !((at_A & at_B))) & 
 		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) & ( !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
-		( G (go_to_A -> ( F at_A))) & 
-		( G (go_to_B -> ( F at_B))) & 
-		( G (go_to_C -> ( F at_C))) & 
-		( G (inspect -> ( F inspection_done))) & 
-		( G (report -> ( F report_ack))) & 
-		( G  !((at_A & at_B))) & 
-		( G  !((at_A & at_C))) & 
 		( G  !((at_B & at_C)))) |  !(go_to_A) &  !(go_to_B) &  !(go_to_C) &  !(inspect) &  !(report) & 
-		( G ( F at_A)) & 
-		( G ( F at_B)) & 
-		( G ( F at_C)) & 
-		( G (alert_A -> ( F go_to_A))) & 
-		( G (alert_B -> ( F go_to_B))) & 
-		( G (alert_C -> ( F go_to_C))) & 
-		( G ((at_A & alert_A) -> ( F inspect))) & 
-		( G ((at_B & alert_B) -> ( F inspect))) & 
-		( G ((at_C & alert_C) -> ( F inspect))) & 
-		( G (inspection_done -> ( F report))) & 
-		( G ((( !(at_A) &  !(at_B)) &  !(at_C)) ->  !(inspect))) & 
-		( G ((at_A &  !(alert_A)) ->  !(inspect))) & 
-		( G ((at_B &  !(alert_B)) ->  !(inspect))) & 
-		( G ((at_C &  !(alert_C)) ->  !(inspect))) & ( !(report) U inspection_done) & 
-		( G  !((inspect & go_to_A))) & 
-		( G  !((inspect & go_to_B))) & 
-		( G  !((inspect & go_to_C))) & 
-		( G  !((go_to_A & go_to_B))) & 
-		( G  !((go_to_A & go_to_C))) & 
-		( G  !((go_to_B & go_to_C))) & 
-		( G (report_ack -> ( !(inspect) U (((((alert_A | alert_B) | alert_C) | go_to_A) | go_to_B) | go_to_C)))) & 
-		( G ((at_A & alert_A) -> ( X ( X (inspect |  !(at_A)))))) & 
-		( G ((at_B & alert_B) -> ( X ( X (inspect |  !(at_B)))))) & 
-		( G ((at_C & alert_C) -> ( X ( X (inspect |  !(at_C)))))))))))) -> (( !( !(alert_A) &  !(alert_B) &  !(alert_C)) |  !(at_A) &  !(at_B) &  !(at_C) &  !(inspect) &  !(report) &  !(inspection_done) &  !(report_ack) & 
 		( G ( F at_A)) & 
 		( G ( F at_B)) & 
 		( G ( F at_C)) & 
@@ -172,5 +106,16 @@ VAR
 		( G (inspection_done -> ( F report_ack))) & 
 		( G  !((at_A & at_B))) & 
 		( G  !((at_A & at_C))) & 
-		( G  !((at_B & at_C)))) |  !( !(alert_A) &  !(alert_B) &  !(alert_C)))) )
+		( G  !((at_B & at_C)))) |  !( !(at_A) &  !(at_B) &  !(at_C) &  !(alert_A) &  !(alert_B) &  !(alert_C) &  !(inspection_done) &  !(report_ack) & 
+		( G (go_to_A -> ( F at_A))) & 
+		( G (go_to_B -> ( F at_B))) & 
+		( G (go_to_C -> ( F at_C))) & 
+		( G (inspect -> ( F inspection_done))) & 
+		( G (report -> ( F report_ack))) & 
+		( G ((alert_A &  !(inspection_done)) -> ( X alert_A))) & 
+		( G ((alert_B &  !(inspection_done)) -> ( X alert_B))) & 
+		( G ((alert_C &  !(inspection_done)) -> ( X alert_C))) & 
+		( G  !((at_A & at_B))) & 
+		( G  !((at_A & at_C))) & 
+		( G  !((at_B & at_C)))))) )
 

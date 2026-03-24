@@ -1,65 +1,50 @@
 MODULE main
 VAR
-	go_to_shelf : boolean;
-	pickup : boolean;
-	go_to_dock : boolean;
-	dropoff : boolean;
 	at_shelf : boolean;
 	has_item : boolean;
 	at_dock : boolean;
 	delivered : boolean;
 	task : boolean;
+	go_to_shelf : boolean;
+	pickup : boolean;
+	go_to_dock : boolean;
+	dropoff : boolean;
 	done : boolean;
 	LTLSPEC (
-		( !(task) & 
-		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task))) -> (( !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
 		( G (go_to_shelf -> ( F at_shelf))) & 
 		( G (pickup -> ( F has_item))) & 
 		( G (go_to_dock -> ( F at_dock))) & 
 		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !((( !( !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff)) |  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock))) ->  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
 		( G (go_to_shelf -> ( F at_shelf))) & 
 		( G (pickup -> ( F has_item))) & 
 		( G (go_to_dock -> ( F at_dock))) & 
 		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) & ( !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
-		( G (go_to_shelf -> ( F at_shelf))) & 
-		( G (pickup -> ( F has_item))) & 
-		( G (go_to_dock -> ( F at_dock))) & 
-		( G (dropoff -> ( F delivered))) & 
-		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(done) & 
-		( G (((task &  !(has_item)) &  !(at_shelf)) -> ( F go_to_shelf))) & 
-		( G (at_shelf -> ( F pickup))) & 
-		( G (has_item -> ( F go_to_dock))) & 
-		( G ((at_dock & has_item) -> ( F dropoff))) & 
-		( G ( !(at_shelf) ->  !(pickup))) & 
-		( G (( !(at_dock) |  !(has_item)) ->  !(dropoff))) & ( !(go_to_dock) U has_item) & ( !(dropoff) U at_dock) & 
-		( G  !((go_to_shelf & pickup))) & 
-		( G  !((go_to_shelf & go_to_dock))) & 
-		( G  !((pickup & go_to_dock))) & 
-		( G  !((pickup & dropoff))) & 
-		( G  !((go_to_dock & dropoff))) & 
-		( G (delivered <-> done)) & 
-		( G ( F done))))))) )
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock)))) )
 
 	LTLSPEC (
-		(((( !( !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff)) |  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		((( !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
 		( G (go_to_shelf -> ( F at_shelf))) & 
 		( G (pickup -> ( F has_item))) & 
 		( G (go_to_dock -> ( F at_dock))) & 
 		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) & ( !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
-		( G (go_to_shelf -> ( F at_shelf))) & 
-		( G (pickup -> ( F has_item))) & 
-		( G (go_to_dock -> ( F at_dock))) & 
-		( G (dropoff -> ( F delivered))) & 
-		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(done) & 
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock)))) |  !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(done) & 
 		( G (((task &  !(has_item)) &  !(at_shelf)) -> ( F go_to_shelf))) & 
 		( G (at_shelf -> ( F pickup))) & 
 		( G (has_item -> ( F go_to_dock))) & 
@@ -71,46 +56,43 @@ VAR
 		( G  !((pickup & go_to_dock))) & 
 		( G  !((pickup & dropoff))) & 
 		( G  !((go_to_dock & dropoff))) & 
+		( G ((go_to_shelf &  !(at_shelf)) -> ( X go_to_shelf))) & 
+		( G ((go_to_dock &  !(at_dock)) -> ( X go_to_dock))) & 
 		( G (delivered <-> done)) & 
-		( G ( F done)))) |  !((( !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		( G ( F done))) |  !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
 		( G (go_to_shelf -> ( F at_shelf))) & 
 		( G (pickup -> ( F has_item))) & 
 		( G (go_to_dock -> ( F at_dock))) & 
 		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !((( !( !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff)) |  !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock))))) -> (( !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
 		( G (go_to_shelf -> ( F at_shelf))) & 
 		( G (pickup -> ( F has_item))) & 
 		( G (go_to_dock -> ( F at_dock))) & 
 		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) & ( !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
-		( G (go_to_shelf -> ( F at_shelf))) & 
-		( G (pickup -> ( F has_item))) & 
-		( G (go_to_dock -> ( F at_dock))) & 
-		( G (dropoff -> ( F delivered))) & 
-		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(done) & 
-		( G (((task &  !(has_item)) &  !(at_shelf)) -> ( F go_to_shelf))) & 
-		( G (at_shelf -> ( F pickup))) & 
-		( G (has_item -> ( F go_to_dock))) & 
-		( G ((at_dock & has_item) -> ( F dropoff))) & 
-		( G ( !(at_shelf) ->  !(pickup))) & 
-		( G (( !(at_dock) |  !(has_item)) ->  !(dropoff))) & ( !(go_to_dock) U has_item) & ( !(dropoff) U at_dock) & 
-		( G  !((go_to_shelf & pickup))) & 
-		( G  !((go_to_shelf & go_to_dock))) & 
-		( G  !((pickup & go_to_dock))) & 
-		( G  !((pickup & dropoff))) & 
-		( G  !((go_to_dock & dropoff))) & 
-		( G (delivered <-> done)) & 
-		( G ( F done)))))))) -> (( !( !(task) & 
-		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))) |  !(go_to_shelf) &  !(at_shelf) &  !(pickup) &  !(has_item) &  !(go_to_dock) &  !(at_dock) &  !(dropoff) &  !(delivered) &  !(done) & 
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock)))) |  !(go_to_shelf) &  !(pickup) &  !(go_to_dock) &  !(dropoff) &  !(done) & 
 		( G (task -> ( F delivered))) & ( !(go_to_dock) U has_item) & ( !(dropoff) U at_dock) & 
 		( G  !((go_to_shelf & pickup))) & 
 		( G  !((pickup & go_to_dock))) & 
 		( G  !((go_to_dock & dropoff))) & 
-		( G ( F done))) |  !( !(task) & 
+		( G ( F done))) |  !( !(at_shelf) &  !(has_item) &  !(at_dock) &  !(delivered) &  !(task) & 
+		( G (go_to_shelf -> ( F at_shelf))) & 
+		( G (pickup -> ( F has_item))) & 
+		( G (go_to_dock -> ( F at_dock))) & 
+		( G (dropoff -> ( F delivered))) & 
 		( G ( F task)) & 
-		( G ((task &  !(delivered)) -> ( X task)))))) )
+		( G ((task &  !(delivered)) -> ( X task))) & 
+		( G ((at_shelf &  !(go_to_dock)) -> ( X at_shelf))) & 
+		( G ((has_item &  !(dropoff)) -> ( X has_item))) & 
+		( G ((at_dock &  !(go_to_shelf)) -> ( X at_dock))) & 
+		( G  !((at_shelf & at_dock)))))) )
 

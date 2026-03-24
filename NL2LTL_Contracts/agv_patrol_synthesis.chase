@@ -1,3 +1,2 @@
-saturate PatrolEnvironment;
 saturate PatrolRobot;
 synthesize PatrolRobot patrol_robot;

@@ -1,5 +1,3 @@
-saturate PatrolEnvironment;
 saturate PatrolRobot;
 saturate System;
-compose PatrolEnvironment PatrolRobot Composed;
-refinement Composed System refinement_patrol.smv;
+refinement PatrolRobot System refinement_patrol.smv;

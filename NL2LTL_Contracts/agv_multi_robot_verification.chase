@@ -2,6 +2,6 @@ saturate Robot1;
 saturate Robot2;
 saturate Arbiter;
 saturate System;
-compose Robot1 Robot2 Robots;
-compose Robots Arbiter Composed;
+compose Robot1 Robot2 R1R2;
+compose R1R2 Arbiter Composed;
 refinement Composed System refinement_multi_robot.smv;

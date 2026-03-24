@@ -36,4 +36,7 @@ report
 (!((at_A & at_B)))
 (!((at_A & at_C)))
 (!((at_B & at_C)))
+((alert_A & (!(inspection_done))) -> alert_A')
+((alert_B & (!(inspection_done))) -> alert_B')
+((alert_C & (!(inspection_done))) -> alert_C')
 

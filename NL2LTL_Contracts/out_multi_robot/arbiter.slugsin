@@ -1,0 +1,23 @@
+[INPUT]
+r1_shelf_request
+r1_dock_request
+r2_shelf_request
+r2_dock_request
+
+
+
+[OUTPUT]
+r1_shelf_grant
+r1_dock_grant
+r2_shelf_grant
+r2_dock_grant
+
+
+
+[ENV_INIT]
+! r1_shelf_request
+! r1_dock_request
+! r2_shelf_request
+! r2_dock_request
+
+

@@ -1,0 +1,372 @@
+MODULE main
+VAR
+	r1_task : boolean;
+	r1_at_shelf : boolean;
+	r1_has_item : boolean;
+	r1_at_dock : boolean;
+	r1_delivered : boolean;
+	r1_shelf_grant : boolean;
+	r1_dock_grant : boolean;
+	r1_go_to_shelf : boolean;
+	r1_pickup : boolean;
+	r1_go_to_dock : boolean;
+	r1_dropoff : boolean;
+	r1_done : boolean;
+	r1_shelf_request : boolean;
+	r1_dock_request : boolean;
+	r2_task : boolean;
+	r2_at_shelf : boolean;
+	r2_has_item : boolean;
+	r2_at_dock : boolean;
+	r2_delivered : boolean;
+	r2_shelf_grant : boolean;
+	r2_dock_grant : boolean;
+	r2_go_to_shelf : boolean;
+	r2_pickup : boolean;
+	r2_go_to_dock : boolean;
+	r2_dropoff : boolean;
+	r2_done : boolean;
+	r2_shelf_request : boolean;
+	r2_dock_request : boolean;
+	LTLSPEC (
+		( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ( F r2_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant))) -> (((( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) &  !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !((( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) & 
+		( G (((r1_task &  !(r1_has_item)) &  !(r1_at_shelf)) -> ( F r1_go_to_shelf))) & 
+		( G (r1_at_shelf -> ( F r1_pickup))) & 
+		( G (r1_has_item -> ( F r1_go_to_dock))) & 
+		( G ((r1_at_dock & r1_has_item) -> ( F r1_dropoff))) & 
+		( G ( !(r1_at_shelf) ->  !(r1_pickup))) & 
+		( G (( !(r1_at_dock) |  !(r1_has_item)) ->  !(r1_dropoff))) & 
+		( G (r1_go_to_shelf -> r1_shelf_request)) & 
+		( G (r1_go_to_dock -> r1_dock_request)) & 
+		( G ( !(r1_shelf_grant) ->  !(r1_go_to_shelf))) & 
+		( G ( !(r1_dock_grant) ->  !(r1_go_to_dock))) & ( !(r1_go_to_dock) U r1_has_item) & ( !(r1_dropoff) U r1_at_dock) & 
+		( G  !((r1_go_to_shelf & r1_go_to_dock))) & 
+		( G  !((r1_pickup & r1_dropoff))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F r1_done))) & ( !( !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G (((r2_task &  !(r2_has_item)) &  !(r2_at_shelf)) -> ( F r2_go_to_shelf))) & 
+		( G (r2_at_shelf -> ( F r2_pickup))) & 
+		( G (r2_has_item -> ( F r2_go_to_dock))) & 
+		( G ((r2_at_dock & r2_has_item) -> ( F r2_dropoff))) & 
+		( G ( !(r2_at_shelf) ->  !(r2_pickup))) & 
+		( G (( !(r2_at_dock) |  !(r2_has_item)) ->  !(r2_dropoff))) & 
+		( G (r2_go_to_shelf -> r2_shelf_request)) & 
+		( G (r2_go_to_dock -> r2_dock_request)) & 
+		( G ( !(r2_shelf_grant) ->  !(r2_go_to_shelf))) & 
+		( G ( !(r2_dock_grant) ->  !(r2_go_to_dock))) & ( !(r2_go_to_dock) U r2_has_item) & ( !(r2_dropoff) U r2_at_dock) & 
+		( G  !((r2_go_to_shelf & r2_go_to_dock))) & 
+		( G  !((r2_pickup & r2_dropoff))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F r2_done)))))) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request)) |  !(((( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) & 
+		( G (((r1_task &  !(r1_has_item)) &  !(r1_at_shelf)) -> ( F r1_go_to_shelf))) & 
+		( G (r1_at_shelf -> ( F r1_pickup))) & 
+		( G (r1_has_item -> ( F r1_go_to_dock))) & 
+		( G ((r1_at_dock & r1_has_item) -> ( F r1_dropoff))) & 
+		( G ( !(r1_at_shelf) ->  !(r1_pickup))) & 
+		( G (( !(r1_at_dock) |  !(r1_has_item)) ->  !(r1_dropoff))) & 
+		( G (r1_go_to_shelf -> r1_shelf_request)) & 
+		( G (r1_go_to_dock -> r1_dock_request)) & 
+		( G ( !(r1_shelf_grant) ->  !(r1_go_to_shelf))) & 
+		( G ( !(r1_dock_grant) ->  !(r1_go_to_dock))) & ( !(r1_go_to_dock) U r1_has_item) & ( !(r1_dropoff) U r1_at_dock) & 
+		( G  !((r1_go_to_shelf & r1_go_to_dock))) & 
+		( G  !((r1_pickup & r1_dropoff))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F r1_done))) & ( !( !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G (((r2_task &  !(r2_has_item)) &  !(r2_at_shelf)) -> ( F r2_go_to_shelf))) & 
+		( G (r2_at_shelf -> ( F r2_pickup))) & 
+		( G (r2_has_item -> ( F r2_go_to_dock))) & 
+		( G ((r2_at_dock & r2_has_item) -> ( F r2_dropoff))) & 
+		( G ( !(r2_at_shelf) ->  !(r2_pickup))) & 
+		( G (( !(r2_at_dock) |  !(r2_has_item)) ->  !(r2_dropoff))) & 
+		( G (r2_go_to_shelf -> r2_shelf_request)) & 
+		( G (r2_go_to_dock -> r2_dock_request)) & 
+		( G ( !(r2_shelf_grant) ->  !(r2_go_to_shelf))) & 
+		( G ( !(r2_dock_grant) ->  !(r2_go_to_dock))) & ( !(r2_go_to_dock) U r2_has_item) & ( !(r2_dropoff) U r2_at_dock) & 
+		( G  !((r2_go_to_shelf & r2_go_to_dock))) & 
+		( G  !((r2_pickup & r2_dropoff))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F r2_done)))) & ( !( !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request)) |  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G  !((r1_shelf_grant & r2_shelf_grant))) & 
+		( G  !((r1_dock_grant & r2_dock_grant))) & 
+		( G (r1_shelf_grant -> r1_shelf_request)) & 
+		( G (r1_dock_grant -> r1_dock_request)) & 
+		( G (r2_shelf_grant -> r2_shelf_request)) & 
+		( G (r2_dock_grant -> r2_dock_request)) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))))))) )
+
+	LTLSPEC (
+		((((( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) & 
+		( G (((r1_task &  !(r1_has_item)) &  !(r1_at_shelf)) -> ( F r1_go_to_shelf))) & 
+		( G (r1_at_shelf -> ( F r1_pickup))) & 
+		( G (r1_has_item -> ( F r1_go_to_dock))) & 
+		( G ((r1_at_dock & r1_has_item) -> ( F r1_dropoff))) & 
+		( G ( !(r1_at_shelf) ->  !(r1_pickup))) & 
+		( G (( !(r1_at_dock) |  !(r1_has_item)) ->  !(r1_dropoff))) & 
+		( G (r1_go_to_shelf -> r1_shelf_request)) & 
+		( G (r1_go_to_dock -> r1_dock_request)) & 
+		( G ( !(r1_shelf_grant) ->  !(r1_go_to_shelf))) & 
+		( G ( !(r1_dock_grant) ->  !(r1_go_to_dock))) & ( !(r1_go_to_dock) U r1_has_item) & ( !(r1_dropoff) U r1_at_dock) & 
+		( G  !((r1_go_to_shelf & r1_go_to_dock))) & 
+		( G  !((r1_pickup & r1_dropoff))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F r1_done))) & ( !( !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G (((r2_task &  !(r2_has_item)) &  !(r2_at_shelf)) -> ( F r2_go_to_shelf))) & 
+		( G (r2_at_shelf -> ( F r2_pickup))) & 
+		( G (r2_has_item -> ( F r2_go_to_dock))) & 
+		( G ((r2_at_dock & r2_has_item) -> ( F r2_dropoff))) & 
+		( G ( !(r2_at_shelf) ->  !(r2_pickup))) & 
+		( G (( !(r2_at_dock) |  !(r2_has_item)) ->  !(r2_dropoff))) & 
+		( G (r2_go_to_shelf -> r2_shelf_request)) & 
+		( G (r2_go_to_dock -> r2_dock_request)) & 
+		( G ( !(r2_shelf_grant) ->  !(r2_go_to_shelf))) & 
+		( G ( !(r2_dock_grant) ->  !(r2_go_to_dock))) & ( !(r2_go_to_dock) U r2_has_item) & ( !(r2_dropoff) U r2_at_dock) & 
+		( G  !((r2_go_to_shelf & r2_go_to_dock))) & 
+		( G  !((r2_pickup & r2_dropoff))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F r2_done)))) & ( !( !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request)) |  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G  !((r1_shelf_grant & r2_shelf_grant))) & 
+		( G  !((r1_dock_grant & r2_dock_grant))) & 
+		( G (r1_shelf_grant -> r1_shelf_request)) & 
+		( G (r1_dock_grant -> r1_dock_request)) & 
+		( G (r2_shelf_grant -> r2_shelf_request)) & 
+		( G (r2_dock_grant -> r2_dock_request)) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant))))) |  !((((( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) &  !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !((( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) & 
+		( G (((r1_task &  !(r1_has_item)) &  !(r1_at_shelf)) -> ( F r1_go_to_shelf))) & 
+		( G (r1_at_shelf -> ( F r1_pickup))) & 
+		( G (r1_has_item -> ( F r1_go_to_dock))) & 
+		( G ((r1_at_dock & r1_has_item) -> ( F r1_dropoff))) & 
+		( G ( !(r1_at_shelf) ->  !(r1_pickup))) & 
+		( G (( !(r1_at_dock) |  !(r1_has_item)) ->  !(r1_dropoff))) & 
+		( G (r1_go_to_shelf -> r1_shelf_request)) & 
+		( G (r1_go_to_dock -> r1_dock_request)) & 
+		( G ( !(r1_shelf_grant) ->  !(r1_go_to_shelf))) & 
+		( G ( !(r1_dock_grant) ->  !(r1_go_to_dock))) & ( !(r1_go_to_dock) U r1_has_item) & ( !(r1_dropoff) U r1_at_dock) & 
+		( G  !((r1_go_to_shelf & r1_go_to_dock))) & 
+		( G  !((r1_pickup & r1_dropoff))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F r1_done))) & ( !( !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G (((r2_task &  !(r2_has_item)) &  !(r2_at_shelf)) -> ( F r2_go_to_shelf))) & 
+		( G (r2_at_shelf -> ( F r2_pickup))) & 
+		( G (r2_has_item -> ( F r2_go_to_dock))) & 
+		( G ((r2_at_dock & r2_has_item) -> ( F r2_dropoff))) & 
+		( G ( !(r2_at_shelf) ->  !(r2_pickup))) & 
+		( G (( !(r2_at_dock) |  !(r2_has_item)) ->  !(r2_dropoff))) & 
+		( G (r2_go_to_shelf -> r2_shelf_request)) & 
+		( G (r2_go_to_dock -> r2_dock_request)) & 
+		( G ( !(r2_shelf_grant) ->  !(r2_go_to_shelf))) & 
+		( G ( !(r2_dock_grant) ->  !(r2_go_to_dock))) & ( !(r2_go_to_dock) U r2_has_item) & ( !(r2_dropoff) U r2_at_dock) & 
+		( G  !((r2_go_to_shelf & r2_go_to_dock))) & 
+		( G  !((r2_pickup & r2_dropoff))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F r2_done)))))) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request)) |  !(((( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) & 
+		( G (((r1_task &  !(r1_has_item)) &  !(r1_at_shelf)) -> ( F r1_go_to_shelf))) & 
+		( G (r1_at_shelf -> ( F r1_pickup))) & 
+		( G (r1_has_item -> ( F r1_go_to_dock))) & 
+		( G ((r1_at_dock & r1_has_item) -> ( F r1_dropoff))) & 
+		( G ( !(r1_at_shelf) ->  !(r1_pickup))) & 
+		( G (( !(r1_at_dock) |  !(r1_has_item)) ->  !(r1_dropoff))) & 
+		( G (r1_go_to_shelf -> r1_shelf_request)) & 
+		( G (r1_go_to_dock -> r1_dock_request)) & 
+		( G ( !(r1_shelf_grant) ->  !(r1_go_to_shelf))) & 
+		( G ( !(r1_dock_grant) ->  !(r1_go_to_dock))) & ( !(r1_go_to_dock) U r1_has_item) & ( !(r1_dropoff) U r1_at_dock) & 
+		( G  !((r1_go_to_shelf & r1_go_to_dock))) & 
+		( G  !((r1_pickup & r1_dropoff))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F r1_done))) & ( !( !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r2_task)) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G (((r2_task &  !(r2_has_item)) &  !(r2_at_shelf)) -> ( F r2_go_to_shelf))) & 
+		( G (r2_at_shelf -> ( F r2_pickup))) & 
+		( G (r2_has_item -> ( F r2_go_to_dock))) & 
+		( G ((r2_at_dock & r2_has_item) -> ( F r2_dropoff))) & 
+		( G ( !(r2_at_shelf) ->  !(r2_pickup))) & 
+		( G (( !(r2_at_dock) |  !(r2_has_item)) ->  !(r2_dropoff))) & 
+		( G (r2_go_to_shelf -> r2_shelf_request)) & 
+		( G (r2_go_to_dock -> r2_dock_request)) & 
+		( G ( !(r2_shelf_grant) ->  !(r2_go_to_shelf))) & 
+		( G ( !(r2_dock_grant) ->  !(r2_go_to_dock))) & ( !(r2_go_to_dock) U r2_has_item) & ( !(r2_dropoff) U r2_at_dock) & 
+		( G  !((r2_go_to_shelf & r2_go_to_dock))) & 
+		( G  !((r2_pickup & r2_dropoff))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F r2_done)))) & ( !( !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request)) |  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G  !((r1_shelf_grant & r2_shelf_grant))) & 
+		( G  !((r1_dock_grant & r2_dock_grant))) & 
+		( G (r1_shelf_grant -> r1_shelf_request)) & 
+		( G (r1_dock_grant -> r1_dock_request)) & 
+		( G (r2_shelf_grant -> r2_shelf_request)) & 
+		( G (r2_dock_grant -> r2_dock_request)) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant))))))))) -> (( !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ( F r2_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))) |  !(r1_go_to_shelf) &  !(r1_pickup) &  !(r1_go_to_dock) &  !(r1_dropoff) &  !(r1_done) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_go_to_shelf) &  !(r2_pickup) &  !(r2_go_to_dock) &  !(r2_dropoff) &  !(r2_done) &  !(r2_shelf_request) &  !(r2_dock_request) &  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_shelf_grant) &  !(r2_dock_grant) & 
+		( G (r1_task -> ( F r1_done))) & 
+		( G (r2_task -> ( F r2_done))) & 
+		( G  !((r1_shelf_grant & r2_shelf_grant))) & 
+		( G  !((r1_dock_grant & r2_dock_grant))) & 
+		( G ( F r1_done)) & 
+		( G ( F r2_done))) |  !( !(r1_task) &  !(r1_at_shelf) &  !(r1_has_item) &  !(r1_at_dock) &  !(r1_delivered) &  !(r1_shelf_grant) &  !(r1_dock_grant) &  !(r2_task) &  !(r2_at_shelf) &  !(r2_has_item) &  !(r2_at_dock) &  !(r2_delivered) &  !(r2_shelf_grant) &  !(r2_dock_grant) &  !(r1_shelf_request) &  !(r1_dock_request) &  !(r2_shelf_request) &  !(r2_dock_request) & 
+		( G ((r1_go_to_shelf & r1_shelf_grant) -> ( F r1_at_shelf))) & 
+		( G (r1_pickup -> ( F r1_has_item))) & 
+		( G ((r1_go_to_dock & r1_dock_grant) -> ( F r1_at_dock))) & 
+		( G (r1_dropoff -> ( F r1_delivered))) & 
+		( G ((r2_go_to_shelf & r2_shelf_grant) -> ( F r2_at_shelf))) & 
+		( G (r2_pickup -> ( F r2_has_item))) & 
+		( G ((r2_go_to_dock & r2_dock_grant) -> ( F r2_at_dock))) & 
+		( G (r2_dropoff -> ( F r2_delivered))) & 
+		( G ( F r1_task)) & 
+		( G ( F r2_task)) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (r1_shelf_request -> ( F r1_shelf_grant))) & 
+		( G (r1_dock_request -> ( F r1_dock_grant))) & 
+		( G (r2_shelf_request -> ( F r2_shelf_grant))) & 
+		( G (r2_dock_request -> ( F r2_dock_grant)))))) )
+
