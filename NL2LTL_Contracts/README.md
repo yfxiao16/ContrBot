@@ -72,11 +72,21 @@ Steps: `saturate` all -> `compose` components (multi-robot only) -> `refinement`
 
 ### Verification Results
 
-| Case | Synthesis | Refinement (NuXMV) |
-|------|-----------|-------------------|
-| Warehouse | realizable | both specs TRUE |
-| Patrol | realizable | both specs TRUE |
-| Multi-robot | all 3 components realizable | spec 1 TRUE, spec 2 no counterexample in BMC k=30 |
+| Case | Synthesis | Refinement | Method | Result |
+|------|-----------|------------|--------|--------|
+| Warehouse | realizable | `Robot ≤ System` | BDD | both specs TRUE |
+| Patrol | realizable | `PatrolRobot ≤ System` | BDD | both specs TRUE |
+| Multi-robot | all 3 realizable | `Robot1 ∥ Robot2 ∥ Arbiter ≤ System` | IC3 | both specs TRUE |
+
+### NuXMV Verification Engines
+
+| Engine | Command | Complete proof? | Mechanism |
+|--------|---------|----------------|-----------|
+| **BDD** | `nuxmv file.smv` | Yes | Builds full state space via BDDs + LTL-to-Büchi automaton |
+| **BMC** | `check_ltlspec_bmc -k N` | No | Unrolls N steps as SAT; only finds counterexamples |
+| **IC3/PDR** | `check_ltlspec_ic3` | Yes | Iterative single-step SAT queries; builds inductive invariant |
+
+BDD explodes on large formulas because the Büchi automaton grows exponentially with LTL formula length. IC3 avoids this by never constructing BDDs or Büchi automata — it uses SAT for each step and handles temporal reasoning via frame iteration. BMC is useful for fast bug-finding but cannot prove TRUE.
 
 ### Usage
 
@@ -86,13 +96,24 @@ export DYLD_LIBRARY_PATH="/path/to/third_party/antlr4/lib:$DYLD_LIBRARY_PATH"
 
 # Synthesis: generate controller FSMs
 logics_tool -i agv_warehouse.ltl -c agv_warehouse_synthesis.chase -o out_warehouse
-# Compile and run slugs
 python3 compiler.py out_warehouse/robot.structuredSlugs > out_warehouse/robot.slugsin
 slugs --explicitStrategy --jsonOutput out_warehouse/robot.slugsin
 
-# Verification: check refinement
+# Verification (small scale): BDD
 logics_tool -i agv_warehouse.ltl -c agv_warehouse_verification.chase -o out_warehouse
 nuxmv out_warehouse/refinement_warehouse.smv
+
+# Verification (large scale): IC3
+logics_tool -i agv_multi_robot.ltl -c agv_multi_robot_verification.chase -o out_multi_robot
+cat > ic3.cmd << 'EOF'
+read_model -i out_multi_robot/refinement_multi_robot.smv
+flatten_hierarchy
+encode_variables
+build_boolean_model
+check_ltlspec_ic3
+quit
+EOF
+nuxmv -source ic3.cmd
 ```
 
 ## Dependencies
