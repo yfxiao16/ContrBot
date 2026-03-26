@@ -1,0 +1,5 @@
+saturate Robot1;
+saturate Robot2;
+
+synthesize Robot1 robot1;
+synthesize Robot2 robot2;

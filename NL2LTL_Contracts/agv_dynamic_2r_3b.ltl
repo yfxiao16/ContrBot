@@ -1,0 +1,279 @@
+NAME: AGV_Dynamic_2R_3B;
+
+# Dynamic decomposition: 2 robots, 3 boxes.
+# Dispatcher assigns tasks reactively to idle robots.
+# System terminates when all 3 boxes are delivered.
+
+CONTRACT Robot1:
+    # Robot 1: generic pickup-deliver worker.
+
+    input boolean variable r1_task;
+    input boolean variable r1_at_pickup;
+    input boolean variable r1_has_box;
+    input boolean variable r1_at_delivery;
+    input boolean variable r1_delivered;
+    input boolean variable all_done;
+
+    output boolean variable r1_go_pickup;
+    output boolean variable r1_pick;
+    output boolean variable r1_go_delivery;
+    output boolean variable r1_drop;
+    output boolean variable r1_done;
+
+    Assumptions:
+        # Initial state
+        !r1_task;
+        !r1_at_pickup;
+        !r1_has_box;
+        !r1_at_delivery;
+        !r1_delivered;
+        !all_done;
+
+        # Navigation liveness
+        G(r1_go_pickup -> F(r1_at_pickup));
+        G(r1_pick -> F(r1_has_box));
+        G(r1_go_delivery -> F(r1_at_delivery));
+        G(r1_drop -> F(r1_delivered));
+
+        # Task fairness: tasks come while boxes remain
+        G F(r1_task | all_done);
+        G(r1_task & !r1_delivered -> X(r1_task));
+
+        # Completion persistence
+        G(all_done -> X(all_done));
+
+    Guarantees:
+        # Initial state
+        !r1_go_pickup;
+        !r1_pick;
+        !r1_go_delivery;
+        !r1_drop;
+        !r1_done;
+
+        # Behavior chain: task -> pickup -> delivery
+        G(r1_task & !r1_has_box & !r1_at_pickup -> F(r1_go_pickup));
+        G(r1_at_pickup -> F(r1_pick));
+        G(r1_has_box -> F(r1_go_delivery));
+        G(r1_at_delivery & r1_has_box -> F(r1_drop));
+
+        # Safety: actions require preconditions
+        G(!r1_at_pickup -> !r1_pick);
+        G(!r1_at_delivery | !r1_has_box -> !r1_drop);
+
+        # Precedence: ordering constraints
+        (!r1_go_delivery) U r1_has_box;
+        (!r1_drop) U r1_at_delivery;
+
+        # Mutual exclusion of actions
+        G(!(r1_go_pickup & r1_go_delivery));
+        G(!(r1_pick & r1_drop));
+
+        # Done semantics
+        G(r1_delivered <-> r1_done);
+
+        # Liveness: complete tasks or all boxes done
+        G F(r1_done | all_done);
+
+CONTRACT Robot2:
+    # Robot 2: generic pickup-deliver worker.
+
+    input boolean variable r2_task;
+    input boolean variable r2_at_pickup;
+    input boolean variable r2_has_box;
+    input boolean variable r2_at_delivery;
+    input boolean variable r2_delivered;
+    input boolean variable all_done;
+
+    output boolean variable r2_go_pickup;
+    output boolean variable r2_pick;
+    output boolean variable r2_go_delivery;
+    output boolean variable r2_drop;
+    output boolean variable r2_done;
+
+    Assumptions:
+        # Initial state
+        !r2_task;
+        !r2_at_pickup;
+        !r2_has_box;
+        !r2_at_delivery;
+        !r2_delivered;
+        !all_done;
+
+        # Navigation liveness
+        G(r2_go_pickup -> F(r2_at_pickup));
+        G(r2_pick -> F(r2_has_box));
+        G(r2_go_delivery -> F(r2_at_delivery));
+        G(r2_drop -> F(r2_delivered));
+
+        # Task fairness: tasks come while boxes remain
+        G F(r2_task | all_done);
+        G(r2_task & !r2_delivered -> X(r2_task));
+
+        # Completion persistence
+        G(all_done -> X(all_done));
+
+    Guarantees:
+        # Initial state
+        !r2_go_pickup;
+        !r2_pick;
+        !r2_go_delivery;
+        !r2_drop;
+        !r2_done;
+
+        # Behavior chain: task -> pickup -> delivery
+        G(r2_task & !r2_has_box & !r2_at_pickup -> F(r2_go_pickup));
+        G(r2_at_pickup -> F(r2_pick));
+        G(r2_has_box -> F(r2_go_delivery));
+        G(r2_at_delivery & r2_has_box -> F(r2_drop));
+
+        # Safety: actions require preconditions
+        G(!r2_at_pickup -> !r2_pick);
+        G(!r2_at_delivery | !r2_has_box -> !r2_drop);
+
+        # Precedence: ordering constraints
+        (!r2_go_delivery) U r2_has_box;
+        (!r2_drop) U r2_at_delivery;
+
+        # Mutual exclusion of actions
+        G(!(r2_go_pickup & r2_go_delivery));
+        G(!(r2_pick & r2_drop));
+
+        # Done semantics
+        G(r2_delivered <-> r2_done);
+
+        # Liveness: complete tasks or all boxes done
+        G F(r2_done | all_done);
+
+CONTRACT Dispatcher:
+    # Reactive task dispatcher: assigns tasks while boxes remain.
+
+    input boolean variable r1_done;
+    input boolean variable r2_done;
+    input boolean variable all_done;
+
+    output boolean variable r1_task;
+    output boolean variable r2_task;
+
+    Assumptions:
+        !r1_done;
+        !r2_done;
+        !all_done;
+
+        # Completion persistence
+        G(all_done -> X(all_done));
+
+    Guarantees:
+        !r1_task;
+        !r2_task;
+
+        # Reactive assignment: completed robot gets new task while boxes remain
+        G(r1_done & !all_done -> F(r1_task));
+        G(r2_done & !all_done -> F(r2_task));
+
+        # Fairness: every robot gets work while boxes remain
+        G F(r1_task | all_done);
+        G F(r2_task | all_done);
+
+CONTRACT System:
+    # Dynamic allocation: 2 robots, 3 boxes.
+
+    input boolean variable r1_at_pickup;
+    input boolean variable r1_has_box;
+    input boolean variable r1_at_delivery;
+    input boolean variable r1_delivered;
+    input boolean variable r2_at_pickup;
+    input boolean variable r2_has_box;
+    input boolean variable r2_at_delivery;
+    input boolean variable r2_delivered;
+    input boolean variable b1_done;
+    input boolean variable b2_done;
+    input boolean variable b3_done;
+    input boolean variable all_done;
+
+    output boolean variable r1_task;
+    output boolean variable r1_go_pickup;
+    output boolean variable r1_pick;
+    output boolean variable r1_go_delivery;
+    output boolean variable r1_drop;
+    output boolean variable r1_done;
+    output boolean variable r2_task;
+    output boolean variable r2_go_pickup;
+    output boolean variable r2_pick;
+    output boolean variable r2_go_delivery;
+    output boolean variable r2_drop;
+    output boolean variable r2_done;
+
+    Assumptions:
+        # Initial state
+        !r1_at_pickup;
+        !r1_has_box;
+        !r1_at_delivery;
+        !r1_delivered;
+        !r2_at_pickup;
+        !r2_has_box;
+        !r2_at_delivery;
+        !r2_delivered;
+        !b1_done;
+        !b2_done;
+        !b3_done;
+        !all_done;
+        !r1_task;
+        !r1_done;
+        !r2_task;
+        !r2_done;
+
+        # Navigation liveness
+        G(r1_go_pickup -> F(r1_at_pickup));
+        G(r1_pick -> F(r1_has_box));
+        G(r1_go_delivery -> F(r1_at_delivery));
+        G(r1_drop -> F(r1_delivered));
+        G(r2_go_pickup -> F(r2_at_pickup));
+        G(r2_pick -> F(r2_has_box));
+        G(r2_go_delivery -> F(r2_at_delivery));
+        G(r2_drop -> F(r2_delivered));
+
+        # Task fairness (needed for CHASE compose compatibility)
+        G F(r1_task | all_done);
+        G F(r2_task | all_done);
+
+        # Task persistence
+        G(r1_task & !r1_delivered -> X(r1_task));
+        G(r2_task & !r2_delivered -> X(r2_task));
+
+        # Box persistence: once delivered, stays delivered
+        G(b1_done -> X(b1_done));
+        G(b2_done -> X(b2_done));
+        G(b3_done -> X(b3_done));
+
+        # Delivery crediting: sequential box completion
+        G((r1_done | r2_done) & !b1_done -> X(b1_done));
+        G((r1_done | r2_done) & b1_done & !b2_done -> X(b2_done));
+        G((r1_done | r2_done) & b1_done & b2_done & !b3_done -> X(b3_done));
+
+        # all_done semantics
+        G(all_done <-> (b1_done & b2_done & b3_done));
+
+    Guarantees:
+        # Initial controller state
+        !r1_task;
+        !r1_go_pickup;
+        !r1_pick;
+        !r1_go_delivery;
+        !r1_drop;
+        !r1_done;
+        !r2_task;
+        !r2_go_pickup;
+        !r2_pick;
+        !r2_go_delivery;
+        !r2_drop;
+        !r2_done;
+
+        # All boxes eventually delivered
+        F(all_done);
+
+        # Completion persistence
+        G(all_done -> X(all_done));
+
+        # Liveness per robot
+        G F(r1_done | all_done);
+        G F(r2_done | all_done);

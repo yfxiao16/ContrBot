@@ -1,0 +1,307 @@
+MODULE main
+VAR
+	r1_task : boolean;
+	r1_at_pickup : boolean;
+	r1_has_box : boolean;
+	r1_at_delivery : boolean;
+	r1_delivered : boolean;
+	all_done : boolean;
+	r1_go_pickup : boolean;
+	r1_pick : boolean;
+	r1_go_delivery : boolean;
+	r1_drop : boolean;
+	r1_done : boolean;
+	r2_task : boolean;
+	r2_at_pickup : boolean;
+	r2_has_box : boolean;
+	r2_at_delivery : boolean;
+	r2_delivered : boolean;
+	r2_go_pickup : boolean;
+	r2_pick : boolean;
+	r2_go_delivery : boolean;
+	r2_drop : boolean;
+	r2_done : boolean;
+	b1_done : boolean;
+	b2_done : boolean;
+	b3_done : boolean;
+	LTLSPEC (
+		( !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(b1_done) &  !(b2_done) &  !(b3_done) &  !(all_done) &  !(r1_task) &  !(r1_done) &  !(r2_task) &  !(r2_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (b1_done -> ( X b1_done))) & 
+		( G (b2_done -> ( X b2_done))) & 
+		( G (b3_done -> ( X b3_done))) & 
+		( G (((r1_done | r2_done) &  !(b1_done)) -> ( X b1_done))) & 
+		( G ((((r1_done | r2_done) & b1_done) &  !(b2_done)) -> ( X b2_done))) & 
+		( G (((((r1_done | r2_done) & b1_done) & b2_done) &  !(b3_done)) -> ( X b3_done))) & 
+		( G (all_done <-> ((b1_done & b2_done) & b3_done))) -> (((( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done))) &  !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !((( !( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) & 
+		( G (((r1_task &  !(r1_has_box)) &  !(r1_at_pickup)) -> ( F r1_go_pickup))) & 
+		( G (r1_at_pickup -> ( F r1_pick))) & 
+		( G (r1_has_box -> ( F r1_go_delivery))) & 
+		( G ((r1_at_delivery & r1_has_box) -> ( F r1_drop))) & 
+		( G ( !(r1_at_pickup) ->  !(r1_pick))) & 
+		( G (( !(r1_at_delivery) |  !(r1_has_box)) ->  !(r1_drop))) & ( !(r1_go_delivery) U r1_has_box) & ( !(r1_drop) U r1_at_delivery) & 
+		( G  !((r1_go_pickup & r1_go_delivery))) & 
+		( G  !((r1_pick & r1_drop))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F (r1_done | all_done)))) & ( !( !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & 
+		( G (((r2_task &  !(r2_has_box)) &  !(r2_at_pickup)) -> ( F r2_go_pickup))) & 
+		( G (r2_at_pickup -> ( F r2_pick))) & 
+		( G (r2_has_box -> ( F r2_go_delivery))) & 
+		( G ((r2_at_delivery & r2_has_box) -> ( F r2_drop))) & 
+		( G ( !(r2_at_pickup) ->  !(r2_pick))) & 
+		( G (( !(r2_at_delivery) |  !(r2_has_box)) ->  !(r2_drop))) & ( !(r2_go_delivery) U r2_has_box) & ( !(r2_drop) U r2_at_delivery) & 
+		( G  !((r2_go_pickup & r2_go_delivery))) & 
+		( G  !((r2_pick & r2_drop))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F (r2_done | all_done))))))) &  !(r1_done) &  !(r2_done) &  !(all_done) & 
+		( G (all_done -> ( X all_done)))) |  !(((( !( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) & 
+		( G (((r1_task &  !(r1_has_box)) &  !(r1_at_pickup)) -> ( F r1_go_pickup))) & 
+		( G (r1_at_pickup -> ( F r1_pick))) & 
+		( G (r1_has_box -> ( F r1_go_delivery))) & 
+		( G ((r1_at_delivery & r1_has_box) -> ( F r1_drop))) & 
+		( G ( !(r1_at_pickup) ->  !(r1_pick))) & 
+		( G (( !(r1_at_delivery) |  !(r1_has_box)) ->  !(r1_drop))) & ( !(r1_go_delivery) U r1_has_box) & ( !(r1_drop) U r1_at_delivery) & 
+		( G  !((r1_go_pickup & r1_go_delivery))) & 
+		( G  !((r1_pick & r1_drop))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F (r1_done | all_done)))) & ( !( !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & 
+		( G (((r2_task &  !(r2_has_box)) &  !(r2_at_pickup)) -> ( F r2_go_pickup))) & 
+		( G (r2_at_pickup -> ( F r2_pick))) & 
+		( G (r2_has_box -> ( F r2_go_delivery))) & 
+		( G ((r2_at_delivery & r2_has_box) -> ( F r2_drop))) & 
+		( G ( !(r2_at_pickup) ->  !(r2_pick))) & 
+		( G (( !(r2_at_delivery) |  !(r2_has_box)) ->  !(r2_drop))) & ( !(r2_go_delivery) U r2_has_box) & ( !(r2_drop) U r2_at_delivery) & 
+		( G  !((r2_go_pickup & r2_go_delivery))) & 
+		( G  !((r2_pick & r2_drop))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F (r2_done | all_done))))) & ( !( !(r1_done) &  !(r2_done) &  !(all_done) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_task) &  !(r2_task) & 
+		( G ((r1_done &  !(all_done)) -> ( F r1_task))) & 
+		( G ((r2_done &  !(all_done)) -> ( F r2_task))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done)))))))) )
+
+	LTLSPEC (
+		((((( !( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) & 
+		( G (((r1_task &  !(r1_has_box)) &  !(r1_at_pickup)) -> ( F r1_go_pickup))) & 
+		( G (r1_at_pickup -> ( F r1_pick))) & 
+		( G (r1_has_box -> ( F r1_go_delivery))) & 
+		( G ((r1_at_delivery & r1_has_box) -> ( F r1_drop))) & 
+		( G ( !(r1_at_pickup) ->  !(r1_pick))) & 
+		( G (( !(r1_at_delivery) |  !(r1_has_box)) ->  !(r1_drop))) & ( !(r1_go_delivery) U r1_has_box) & ( !(r1_drop) U r1_at_delivery) & 
+		( G  !((r1_go_pickup & r1_go_delivery))) & 
+		( G  !((r1_pick & r1_drop))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F (r1_done | all_done)))) & ( !( !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & 
+		( G (((r2_task &  !(r2_has_box)) &  !(r2_at_pickup)) -> ( F r2_go_pickup))) & 
+		( G (r2_at_pickup -> ( F r2_pick))) & 
+		( G (r2_has_box -> ( F r2_go_delivery))) & 
+		( G ((r2_at_delivery & r2_has_box) -> ( F r2_drop))) & 
+		( G ( !(r2_at_pickup) ->  !(r2_pick))) & 
+		( G (( !(r2_at_delivery) |  !(r2_has_box)) ->  !(r2_drop))) & ( !(r2_go_delivery) U r2_has_box) & ( !(r2_drop) U r2_at_delivery) & 
+		( G  !((r2_go_pickup & r2_go_delivery))) & 
+		( G  !((r2_pick & r2_drop))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F (r2_done | all_done))))) & ( !( !(r1_done) &  !(r2_done) &  !(all_done) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_task) &  !(r2_task) & 
+		( G ((r1_done &  !(all_done)) -> ( F r1_task))) & 
+		( G ((r2_done &  !(all_done)) -> ( F r2_task))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done))))) |  !((((( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done))) &  !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !((( !( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) & 
+		( G (((r1_task &  !(r1_has_box)) &  !(r1_at_pickup)) -> ( F r1_go_pickup))) & 
+		( G (r1_at_pickup -> ( F r1_pick))) & 
+		( G (r1_has_box -> ( F r1_go_delivery))) & 
+		( G ((r1_at_delivery & r1_has_box) -> ( F r1_drop))) & 
+		( G ( !(r1_at_pickup) ->  !(r1_pick))) & 
+		( G (( !(r1_at_delivery) |  !(r1_has_box)) ->  !(r1_drop))) & ( !(r1_go_delivery) U r1_has_box) & ( !(r1_drop) U r1_at_delivery) & 
+		( G  !((r1_go_pickup & r1_go_delivery))) & 
+		( G  !((r1_pick & r1_drop))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F (r1_done | all_done)))) & ( !( !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & 
+		( G (((r2_task &  !(r2_has_box)) &  !(r2_at_pickup)) -> ( F r2_go_pickup))) & 
+		( G (r2_at_pickup -> ( F r2_pick))) & 
+		( G (r2_has_box -> ( F r2_go_delivery))) & 
+		( G ((r2_at_delivery & r2_has_box) -> ( F r2_drop))) & 
+		( G ( !(r2_at_pickup) ->  !(r2_pick))) & 
+		( G (( !(r2_at_delivery) |  !(r2_has_box)) ->  !(r2_drop))) & ( !(r2_go_delivery) U r2_has_box) & ( !(r2_drop) U r2_at_delivery) & 
+		( G  !((r2_go_pickup & r2_go_delivery))) & 
+		( G  !((r2_pick & r2_drop))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F (r2_done | all_done))))))) &  !(r1_done) &  !(r2_done) &  !(all_done) & 
+		( G (all_done -> ( X all_done)))) |  !(((( !( !(r1_task) &  !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(all_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) & 
+		( G (((r1_task &  !(r1_has_box)) &  !(r1_at_pickup)) -> ( F r1_go_pickup))) & 
+		( G (r1_at_pickup -> ( F r1_pick))) & 
+		( G (r1_has_box -> ( F r1_go_delivery))) & 
+		( G ((r1_at_delivery & r1_has_box) -> ( F r1_drop))) & 
+		( G ( !(r1_at_pickup) ->  !(r1_pick))) & 
+		( G (( !(r1_at_delivery) |  !(r1_has_box)) ->  !(r1_drop))) & ( !(r1_go_delivery) U r1_has_box) & ( !(r1_drop) U r1_at_delivery) & 
+		( G  !((r1_go_pickup & r1_go_delivery))) & 
+		( G  !((r1_pick & r1_drop))) & 
+		( G (r1_delivered <-> r1_done)) & 
+		( G ( F (r1_done | all_done)))) & ( !( !(r2_task) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(all_done) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (all_done -> ( X all_done)))) |  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & 
+		( G (((r2_task &  !(r2_has_box)) &  !(r2_at_pickup)) -> ( F r2_go_pickup))) & 
+		( G (r2_at_pickup -> ( F r2_pick))) & 
+		( G (r2_has_box -> ( F r2_go_delivery))) & 
+		( G ((r2_at_delivery & r2_has_box) -> ( F r2_drop))) & 
+		( G ( !(r2_at_pickup) ->  !(r2_pick))) & 
+		( G (( !(r2_at_delivery) |  !(r2_has_box)) ->  !(r2_drop))) & ( !(r2_go_delivery) U r2_has_box) & ( !(r2_drop) U r2_at_delivery) & 
+		( G  !((r2_go_pickup & r2_go_delivery))) & 
+		( G  !((r2_pick & r2_drop))) & 
+		( G (r2_delivered <-> r2_done)) & 
+		( G ( F (r2_done | all_done))))) & ( !( !(r1_done) &  !(r2_done) &  !(all_done) & 
+		( G (all_done -> ( X all_done)))) |  !(r1_task) &  !(r2_task) & 
+		( G ((r1_done &  !(all_done)) -> ( F r1_task))) & 
+		( G ((r2_done &  !(all_done)) -> ( F r2_task))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done))))))))) -> (( !( !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(b1_done) &  !(b2_done) &  !(b3_done) &  !(all_done) &  !(r1_task) &  !(r1_done) &  !(r2_task) &  !(r2_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (b1_done -> ( X b1_done))) & 
+		( G (b2_done -> ( X b2_done))) & 
+		( G (b3_done -> ( X b3_done))) & 
+		( G (((r1_done | r2_done) &  !(b1_done)) -> ( X b1_done))) & 
+		( G ((((r1_done | r2_done) & b1_done) &  !(b2_done)) -> ( X b2_done))) & 
+		( G (((((r1_done | r2_done) & b1_done) & b2_done) &  !(b3_done)) -> ( X b3_done))) & 
+		( G (all_done <-> ((b1_done & b2_done) & b3_done)))) |  !(r1_task) &  !(r1_go_pickup) &  !(r1_pick) &  !(r1_go_delivery) &  !(r1_drop) &  !(r1_done) &  !(r2_task) &  !(r2_go_pickup) &  !(r2_pick) &  !(r2_go_delivery) &  !(r2_drop) &  !(r2_done) & ( F all_done) & 
+		( G (all_done -> ( X all_done))) & 
+		( G ( F (r1_done | all_done))) & 
+		( G ( F (r2_done | all_done)))) |  !( !(r1_at_pickup) &  !(r1_has_box) &  !(r1_at_delivery) &  !(r1_delivered) &  !(r2_at_pickup) &  !(r2_has_box) &  !(r2_at_delivery) &  !(r2_delivered) &  !(b1_done) &  !(b2_done) &  !(b3_done) &  !(all_done) &  !(r1_task) &  !(r1_done) &  !(r2_task) &  !(r2_done) & 
+		( G (r1_go_pickup -> ( F r1_at_pickup))) & 
+		( G (r1_pick -> ( F r1_has_box))) & 
+		( G (r1_go_delivery -> ( F r1_at_delivery))) & 
+		( G (r1_drop -> ( F r1_delivered))) & 
+		( G (r2_go_pickup -> ( F r2_at_pickup))) & 
+		( G (r2_pick -> ( F r2_has_box))) & 
+		( G (r2_go_delivery -> ( F r2_at_delivery))) & 
+		( G (r2_drop -> ( F r2_delivered))) & 
+		( G ( F (r1_task | all_done))) & 
+		( G ( F (r2_task | all_done))) & 
+		( G ((r1_task &  !(r1_delivered)) -> ( X r1_task))) & 
+		( G ((r2_task &  !(r2_delivered)) -> ( X r2_task))) & 
+		( G (b1_done -> ( X b1_done))) & 
+		( G (b2_done -> ( X b2_done))) & 
+		( G (b3_done -> ( X b3_done))) & 
+		( G (((r1_done | r2_done) &  !(b1_done)) -> ( X b1_done))) & 
+		( G ((((r1_done | r2_done) & b1_done) &  !(b2_done)) -> ( X b2_done))) & 
+		( G (((((r1_done | r2_done) & b1_done) & b2_done) &  !(b3_done)) -> ( X b3_done))) & 
+		( G (all_done <-> ((b1_done & b2_done) & b3_done)))))) )
+

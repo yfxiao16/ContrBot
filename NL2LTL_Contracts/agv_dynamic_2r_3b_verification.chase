@@ -1,0 +1,9 @@
+saturate Robot1;
+saturate Robot2;
+saturate Dispatcher;
+saturate System;
+
+compose Robot1 Robot2 C1;
+compose C1 Dispatcher Composed;
+
+refinement Composed System refinement_dynamic_2r_3b.smv;

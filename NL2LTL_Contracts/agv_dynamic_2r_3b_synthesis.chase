@@ -1,0 +1,7 @@
+saturate Robot1;
+saturate Robot2;
+saturate Dispatcher;
+
+synthesize Robot1 robot1;
+synthesize Robot2 robot2;
+synthesize Dispatcher dispatcher;

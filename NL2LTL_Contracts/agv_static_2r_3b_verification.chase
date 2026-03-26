@@ -1,0 +1,7 @@
+saturate Robot1;
+saturate Robot2;
+saturate System;
+
+compose Robot1 Robot2 Composed;
+
+refinement Composed System refinement_static_2r_3b.smv;

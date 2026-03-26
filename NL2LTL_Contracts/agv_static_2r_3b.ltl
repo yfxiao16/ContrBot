@@ -1,0 +1,252 @@
+NAME: AGV_Static_2R_3B;
+
+# Static decomposition: 2 robots, 3 boxes.
+# Pre-assignment (round-robin): Robot1 -> box 1,3, Robot2 -> box 2
+# Each robot tracks delivery completions for its assigned boxes.
+# System terminates when all robots finish their assignments.
+
+CONTRACT Robot1:
+    # Robot 1: delivers 2 assigned box(es): [1, 3]
+
+    input boolean variable r1_task;
+    input boolean variable r1_at_pickup;
+    input boolean variable r1_has_box;
+    input boolean variable r1_at_delivery;
+    input boolean variable r1_delivered;
+    input boolean variable r1_del_1;
+    input boolean variable r1_del_2;
+
+    output boolean variable r1_go_pickup;
+    output boolean variable r1_pick;
+    output boolean variable r1_go_delivery;
+    output boolean variable r1_drop;
+    output boolean variable r1_done;
+
+    Assumptions:
+        # Initial state
+        !r1_task;
+        !r1_at_pickup;
+        !r1_has_box;
+        !r1_at_delivery;
+        !r1_delivered;
+        !r1_del_1;
+        !r1_del_2;
+
+        # Navigation liveness
+        G(r1_go_pickup -> F(r1_at_pickup));
+        G(r1_pick -> F(r1_has_box));
+        G(r1_go_delivery -> F(r1_at_delivery));
+        G(r1_drop -> F(r1_delivered));
+
+        # Task fairness: tasks come while deliveries remain
+        G F(r1_task | r1_del_2);
+        G(r1_task & !r1_delivered -> X(r1_task));
+
+        # Delivery tracking: sequential crediting
+        G(r1_done & !r1_del_1 -> X(r1_del_1));
+        G(r1_done & r1_del_1 & !r1_del_2 -> X(r1_del_2));
+
+        # Delivery persistence: once credited, stays credited
+        G(r1_del_1 -> X(r1_del_1));
+        G(r1_del_2 -> X(r1_del_2));
+
+    Guarantees:
+        # Initial state
+        !r1_go_pickup;
+        !r1_pick;
+        !r1_go_delivery;
+        !r1_drop;
+        !r1_done;
+
+        # Behavior chain: task -> pickup -> delivery
+        G(r1_task & !r1_has_box & !r1_at_pickup -> F(r1_go_pickup));
+        G(r1_at_pickup -> F(r1_pick));
+        G(r1_has_box -> F(r1_go_delivery));
+        G(r1_at_delivery & r1_has_box -> F(r1_drop));
+
+        # Safety: actions require preconditions
+        G(!r1_at_pickup -> !r1_pick);
+        G(!r1_at_delivery | !r1_has_box -> !r1_drop);
+
+        # Precedence: ordering constraints
+        (!r1_go_delivery) U r1_has_box;
+        (!r1_drop) U r1_at_delivery;
+
+        # Mutual exclusion of actions
+        G(!(r1_go_pickup & r1_go_delivery));
+        G(!(r1_pick & r1_drop));
+
+        # Done semantics
+        G(r1_delivered <-> r1_done);
+
+        # Liveness: complete tasks or all assigned boxes done
+        G F(r1_done | r1_del_2);
+
+CONTRACT Robot2:
+    # Robot 2: delivers 1 assigned box(es): [2]
+
+    input boolean variable r2_task;
+    input boolean variable r2_at_pickup;
+    input boolean variable r2_has_box;
+    input boolean variable r2_at_delivery;
+    input boolean variable r2_delivered;
+    input boolean variable r2_del_1;
+
+    output boolean variable r2_go_pickup;
+    output boolean variable r2_pick;
+    output boolean variable r2_go_delivery;
+    output boolean variable r2_drop;
+    output boolean variable r2_done;
+
+    Assumptions:
+        # Initial state
+        !r2_task;
+        !r2_at_pickup;
+        !r2_has_box;
+        !r2_at_delivery;
+        !r2_delivered;
+        !r2_del_1;
+
+        # Navigation liveness
+        G(r2_go_pickup -> F(r2_at_pickup));
+        G(r2_pick -> F(r2_has_box));
+        G(r2_go_delivery -> F(r2_at_delivery));
+        G(r2_drop -> F(r2_delivered));
+
+        # Task fairness: tasks come while deliveries remain
+        G F(r2_task | r2_del_1);
+        G(r2_task & !r2_delivered -> X(r2_task));
+
+        # Delivery tracking: sequential crediting
+        G(r2_done & !r2_del_1 -> X(r2_del_1));
+
+        # Delivery persistence: once credited, stays credited
+        G(r2_del_1 -> X(r2_del_1));
+
+    Guarantees:
+        # Initial state
+        !r2_go_pickup;
+        !r2_pick;
+        !r2_go_delivery;
+        !r2_drop;
+        !r2_done;
+
+        # Behavior chain: task -> pickup -> delivery
+        G(r2_task & !r2_has_box & !r2_at_pickup -> F(r2_go_pickup));
+        G(r2_at_pickup -> F(r2_pick));
+        G(r2_has_box -> F(r2_go_delivery));
+        G(r2_at_delivery & r2_has_box -> F(r2_drop));
+
+        # Safety: actions require preconditions
+        G(!r2_at_pickup -> !r2_pick);
+        G(!r2_at_delivery | !r2_has_box -> !r2_drop);
+
+        # Precedence: ordering constraints
+        (!r2_go_delivery) U r2_has_box;
+        (!r2_drop) U r2_at_delivery;
+
+        # Mutual exclusion of actions
+        G(!(r2_go_pickup & r2_go_delivery));
+        G(!(r2_pick & r2_drop));
+
+        # Done semantics
+        G(r2_delivered <-> r2_done);
+
+        # Liveness: complete tasks or all assigned boxes done
+        G F(r2_done | r2_del_1);
+
+CONTRACT System:
+    # Static allocation: 2 robots, 3 boxes.
+    # Assignment: Robot1->[1,3], Robot2->[2]
+
+    input boolean variable r1_task;
+    input boolean variable r1_at_pickup;
+    input boolean variable r1_has_box;
+    input boolean variable r1_at_delivery;
+    input boolean variable r1_delivered;
+    input boolean variable r1_del_1;
+    input boolean variable r1_del_2;
+    input boolean variable r2_task;
+    input boolean variable r2_at_pickup;
+    input boolean variable r2_has_box;
+    input boolean variable r2_at_delivery;
+    input boolean variable r2_delivered;
+    input boolean variable r2_del_1;
+
+    output boolean variable r1_go_pickup;
+    output boolean variable r1_pick;
+    output boolean variable r1_go_delivery;
+    output boolean variable r1_drop;
+    output boolean variable r1_done;
+    output boolean variable r2_go_pickup;
+    output boolean variable r2_pick;
+    output boolean variable r2_go_delivery;
+    output boolean variable r2_drop;
+    output boolean variable r2_done;
+
+    Assumptions:
+        # Initial state
+        !r1_task;
+        !r1_at_pickup;
+        !r1_has_box;
+        !r1_at_delivery;
+        !r1_delivered;
+        !r1_del_1;
+        !r1_del_2;
+        !r2_task;
+        !r2_at_pickup;
+        !r2_has_box;
+        !r2_at_delivery;
+        !r2_delivered;
+        !r2_del_1;
+
+        # Navigation liveness
+        G(r1_go_pickup -> F(r1_at_pickup));
+        G(r1_pick -> F(r1_has_box));
+        G(r1_go_delivery -> F(r1_at_delivery));
+        G(r1_drop -> F(r1_delivered));
+        G(r2_go_pickup -> F(r2_at_pickup));
+        G(r2_pick -> F(r2_has_box));
+        G(r2_go_delivery -> F(r2_at_delivery));
+        G(r2_drop -> F(r2_delivered));
+
+        # Task fairness: tasks come while robot has boxes remaining
+        G F(r1_task | r1_del_2);
+        G F(r2_task | r2_del_1);
+
+        # Task persistence
+        G(r1_task & !r1_delivered -> X(r1_task));
+        G(r2_task & !r2_delivered -> X(r2_task));
+
+        # Delivery tracking
+        G(r1_done & !r1_del_1 -> X(r1_del_1));
+        G(r1_done & r1_del_1 & !r1_del_2 -> X(r1_del_2));
+        G(r2_done & !r2_del_1 -> X(r2_del_1));
+
+        # Delivery persistence
+        G(r1_del_1 -> X(r1_del_1));
+        G(r1_del_2 -> X(r1_del_2));
+        G(r2_del_1 -> X(r2_del_1));
+
+    Guarantees:
+        # Initial controller state
+        !r1_go_pickup;
+        !r1_pick;
+        !r1_go_delivery;
+        !r1_drop;
+        !r1_done;
+        !r2_go_pickup;
+        !r2_pick;
+        !r2_go_delivery;
+        !r2_drop;
+        !r2_done;
+
+        # All boxes eventually delivered
+        F(r1_del_2 & r2_del_1);
+
+        # Completion persistence: once all done, stays done
+        G((r1_del_2 & r2_del_1) -> X(r1_del_2 & r2_del_1));
+
+        # Liveness per robot
+        G F(r1_done | r1_del_2);
+        G F(r2_done | r2_del_1);
