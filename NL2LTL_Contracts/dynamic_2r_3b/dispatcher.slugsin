@@ -1,0 +1,23 @@
+[INPUT]
+r1_done
+r2_done
+all_done
+
+
+
+[OUTPUT]
+r1_task
+r2_task
+
+
+
+[ENV_TRANS]
+| ! all_done all_done'
+
+
+[ENV_INIT]
+! r1_done
+! r2_done
+! all_done
+
+

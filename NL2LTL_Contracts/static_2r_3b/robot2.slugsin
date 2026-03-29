@@ -1,0 +1,42 @@
+[INPUT]
+r2_task
+r2_at_pickup
+r2_has_box
+r2_at_delivery
+r2_delivered
+r2_del_1
+
+
+
+[OUTPUT]
+r2_go_pickup
+r2_pick
+r2_go_delivery
+r2_drop
+r2_done
+
+
+
+[ENV_TRANS]
+| ! r2_go_pickup r2_at_pickup
+| ! r2_pick r2_has_box
+| ! r2_go_delivery r2_at_delivery
+| ! r2_drop r2_delivered
+| ! & r2_task ! r2_delivered r2_task'
+| ! & r2_done ! r2_del_1 r2_del_1'
+| ! r2_del_1 r2_del_1'
+
+
+[ENV_INIT]
+! r2_task
+! r2_at_pickup
+! r2_has_box
+! r2_at_delivery
+! r2_delivered
+! r2_del_1
+
+
+[ENV_LIVENESS]
+| r2_task r2_del_1
+
+

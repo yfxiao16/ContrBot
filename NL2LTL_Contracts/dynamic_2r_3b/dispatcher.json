@@ -1,0 +1,75 @@
+SLUGS: SmaLl bUt complete Gr(1) Synthesis tool (see the documentation for an author list).
+RESULT: Specification is realizable.
+{"version": 0,
+ "slugs": "0.0.1",
+
+ "variables": ["r1_done", "r2_done", "all_done", "r1_task", "r2_task"],
+
+ "nodes": {
+"0": {
+	"rank": 0,
+	"state": [0, 0, 0, 0, 0],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"1": {
+	"rank": 0,
+	"state": [0, 0, 0, 0, 1],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"2": {
+	"rank": 0,
+	"state": [0, 0, 0, 1, 0],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"3": {
+	"rank": 0,
+	"state": [0, 0, 0, 1, 1],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"4": {
+	"rank": 0,
+	"state": [0, 0, 1, 0, 0],
+	"trans": [4, 6, 8, 10]
+},
+
+"5": {
+	"rank": 0,
+	"state": [0, 1, 0, 0, 0],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"6": {
+	"rank": 0,
+	"state": [0, 1, 1, 0, 0],
+	"trans": [4, 6, 8, 10]
+},
+
+"7": {
+	"rank": 0,
+	"state": [1, 0, 0, 0, 0],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"8": {
+	"rank": 0,
+	"state": [1, 0, 1, 0, 0],
+	"trans": [4, 6, 8, 10]
+},
+
+"9": {
+	"rank": 0,
+	"state": [1, 1, 0, 0, 0],
+	"trans": [0, 4, 5, 6, 7, 8, 9, 10]
+},
+
+"10": {
+	"rank": 0,
+	"state": [1, 1, 1, 0, 0],
+	"trans": [4, 6, 8, 10]
+}
+
+}}
